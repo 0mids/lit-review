@@ -62,11 +62,11 @@ and security studies measure attacks precisely but never price defences in delay
 \draw[tap] (11.5,-2.95) -- (11.5,-4.65) node[pos=0.70, right=0pt, lab, align=left] {keystrokes\\97.62\%};
 \draw[tap] (13.3,-3.6)  -- (13.3,-4.65) node[pos=0.50, right=0pt, lab, align=left] {viewport\\re-ID};
 % legend and costs
-\node[lab, align=left, anchor=north west, text width=8.3cm] at (0,-4.15) {\hyphenpenalty=10000%
+\node[lab, align=left, anchor=north west, text width=8.3cm] at (0,-4.15) {%
   \tikz[baseline=-0.6ex]\draw[meas] (0,0)--(0.6,0); measured\enspace
   \tikz[baseline=-0.6ex]\draw[assm] (0,0)--(0.6,0); assumed\enspace
   \tikz[baseline=-0.6ex]\draw[tap] (0,0)--(0.6,0); attack (accuracy)\\[1pt]
-  Also measured: AR user location from traffic, 94\%. Defence cost: encrypting 1400-byte packets misses
+  Also measured: AR user location from traffic, 94\%. Defence cost: \mbox{encrypting} 1400-byte packets misses
   a 0.35~ms edge budget; padding or jitter alone does not stop scene leakage.};
 \end{tikzpicture}
 \caption{Measurement chain and attack surfaces of a networked XR session. Solid arrows are links that user
@@ -97,8 +97,8 @@ Other factors are content and group effects. For volumetric content, frame rate 
 HoloLens~2 (N=32) \cite{W4387831705}. Cybersickness is contested: fewer than 22\% of viewers reported it
 for AR point clouds \cite{W4387831705}, and it was ``not an issue'' for 360-degree video
 \cite{W4212788331}; content motion and display, not the network, seem to drive it. Group QoE is tested
-almost only in pairs \cite{W4415821547}, with the impairment on one link, so group-level effects of who is delayed
-remain unknown.
+almost only in pairs \cite{W4415821547}, with the impairment on one link, so the effect of who is
+delayed in larger groups remains unknown.
 
 \subsection{Models, standards and traffic}
 Objective models are established for coding impairments and unproven for network ones. PSNR tracks
@@ -125,20 +125,20 @@ pacing in 5.56~ms batches set frame delay at 6--21~ms over Wi-Fi~6 with an RTT o
 \cite{W4391506055}. Under 27~Mbps throttling, adaptive bitrate kept cloud VR frame loss at or below 5.12\%
 where a fixed 40~Mbps stream lost 32.51\% \cite{W4210470894}. Models fitted to one stack disagree: the
 3GPP baseline underestimated effective VR bitrate by 25\% \cite{W4399340506}, and the open RiftCat model
-matched mean but not 95th-percentile delay \cite{W3192844644}. Shared worlds need far less than stated:
-Horizon Workrooms used 2--3~Mbps downlink and 0.6~Mbps uplink \cite{W4294643390}, far below the
-per-user rates that metaverse visions state (\cref{sec:provision}).
+matched mean but not 95th-percentile delay \cite{W3192844644}. Shared worlds need less than is stated:
+Horizon Workrooms used 2--3~Mbps downlink and 0.6~Mbps uplink \cite{W4294643390}, about two orders of
+magnitude below the per-user rates in metaverse visions (\cref{sec:provision}).
 
 \subsection{Attacks on XR traffic}
 Encrypted XR traffic leaks what users do, and this result is established across platforms and groups.
 Traffic patterns of a mobile AR application located users with 94\% accuracy \cite{W2946752973}. On Meta
 Quest Pro, off-the-shelf classifiers identified applications with 92.4\% accuracy and activities with
-91\%, from less than 10 minutes of traffic per application \cite{W4406880464}. Offloading AR glasses reveal the type of physical scene through packet
-sizes and timing \cite{W7215028895}.
+91\%, from less than 10 minutes of traffic per application \cite{W4406880464}. Offloading AR glasses
+reveal the type of physical scene through packet sizes and timing \cite{W7215028895}.
 
 Motion data are the sharpest channel. Avatar motion received by an adversary's own client in multi-user VR
 yielded 97.62\% of typed keystrokes, and the attack generalised to four applications
-\cite{W4398796475}. The first result
+\cite{W4398796475}. The result
 turns state synchronisation, which broadcasts head and hand poses to every peer, into a leakage channel.
 Platform audits add the provider as observer: about 70\% of Oculus data flows were not properly disclosed
 \cite{W3202887304}.
@@ -154,8 +154,8 @@ IoT and enterprise datasets that contain no XR flows \cite{W4388011607}. The exc
 line-rate detection in Tofino switches at up to 99\% accuracy with under 5\% of switch resources
 \cite{W4387412865} and the first labelled metaverse attack dataset \cite{W7127620891}. Blockchain is
 contested: a 10-user pilot kept 88~FPS at 142 transactions per second \cite{W7161842864}, while most
-ledger frameworks report no latency at all. Federated learning failed for VR biometric authentication, below 10\% accuracy
-\cite{W4378696892}.
+ledger frameworks report no latency at all. Federated learning failed for VR biometric authentication, at below 10\%
+accuracy \cite{W4378696892}.
 
 The privacy--QoE trade-off is modelled, not perceived. Viewpoint leakage persists under federated
 prediction once prediction errors or QoE are uploaded \cite{W4223932369}. Noise remapping reduced the QoE
