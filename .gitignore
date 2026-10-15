@@ -7,3 +7,4 @@ main.pdf
 *.toc
 *.synctex.gz
 test_*
+t_*
