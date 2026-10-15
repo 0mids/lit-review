@@ -98,9 +98,9 @@ systems under different conditions; they locate each cost but are not matched op
 \label{tab:encode-families}
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.45cm}>{\raggedright\arraybackslash}X%
->{\raggedright\arraybackslash}p{2.35cm}>{\raggedright\arraybackslash}p{2.45cm}%
->{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.3cm}@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}X%
+>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.4cm}%
+>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.55cm}@{}}
 \toprule
 Family & Idea & Cost on wire & Cost at sender & Cost at receiver & Maturity\\
 \midrule
@@ -111,7 +111,7 @@ Geometry & Meshes: surfaces from fused depth & 14~Mbps mean (reconstructed scene
 Learned & Neural scene (NeRF, 3DGS): model parameters per frame & 0.53~MB per frame & training $\approx$1~min per frame & splat rendering, 37~ms per frame & research prototypes\\
 Learned & Semantic and generative: meaning, not pixels & 93--99.9\% less & inference, shared knowledge base & generative inference; 13.7~s end to end & simulation, one 5G prototype\\
 Signal & Haptic: samples sent only above a perceptual threshold & 80--90\% fewer packets & negligible, delay-free & hold or predict missing samples & standard (IEEE~1918.1.1)\\
-Signal & Holographic light field: the wavefront itself & 6.63~TBps by arithmetic; 173~Mbps measured & V-PCC 11--42~min per second & display not characterised & requirement tables\\
+Signal & Holographic: light field or phase pattern & 6.63~TBps by arithmetic; 173~Mbps measured & V-PCC 11--42~min per second & display not characterised & requirement tables\\
 \bottomrule
 \end{tabularx}
 \end{table}
