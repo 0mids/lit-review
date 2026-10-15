@@ -1,6 +1,6 @@
-\section{Delivering Ahead of the User: Adaptation, Prediction and Caching}\label{sec:anticipate}
+\section{Delivering Ahead of the User: Prediction, Adaptation and Caching}\label{sec:anticipate}
 
-An immersive client displays only a fraction of what it could receive, and it must request that fraction before the user looks there. This section asks how a system decides what to fetch, at what quality and from where, ahead of the user's head and body (\cref{fig:anticipate-arch}). The function covers \fnAnticipateN{} papers (\fnAnticipateSh{} of the corpus), and its share fell from \fnAnticipateEarly{} in 2017--2019 to \fnAnticipateLate{} in 2022--2024. Rate adaptation and adaptive streaming remains the largest problem cell in the atlas, with \nxrNProbRateAdaptationStreaming{} papers, but it grew by \nxrCagrProbRateAdaptationStreaming{} a year while the corpus grew by \nxrCagrTotal{}. Viewport and motion prediction (\nxrNProbViewportMotionPrediction{} papers) and caching and prefetching (\nxrNProbCachingPrefetching{}) are smaller and growing faster. The decline tracks that of 360-degree video, the content all three were built for, whose share fell from \nxrShContVideoThreeSixtyEarly{} to \nxrShContVideoThreeSixtyLate{}. Evidence thins along the chain: \nxrRealRateAdaptationStreaming{} of rate-adaptation papers use a real testbed and \nxrUsersRateAdaptationStreaming{} involve users; prediction is judged mainly on recorded traces (\nxrTraceViewportMotionPrediction{}); caching is judged mainly in simulation (\nxrSimCachingPrefetching{}) and never with users. Codecs are treated in \cref{sec:encode}, remote rendering in \cref{sec:compute}.
+An immersive client displays only a fraction of what it could receive, and it must request that fraction before the user looks there. Delivery is therefore a bet on the user's future attention. Three decisions place the bet: \emph{what to predict} about the user, \emph{what to fetch} given that prediction and the network, and \emph{where to keep} content so that it is close when needed. They form one loop (\cref{fig:anticipate-arch}). The predictor's horizon limits how deep the buffer may be, the buffer's depth fixes how far ahead the fetcher commits bandwidth, and the caches upstream decide how expensive a wrong commitment is. This section treats each decision in turn, summarises the families of approaches in \cref{tab:anticipate-families}, and then follows the coupling, which explains why measured savings shrink as evaluations become realistic. How content is tiled and represented is the subject of \cref{sec:encode}; the same predictions hide rendering delay in \cref{sec:compute}; the radio and transport that carry the fetched bits are treated in \cref{sec:provision}.
 
 \begin{figure}[t]
 \centering
@@ -13,7 +13,9 @@ An immersive client displays only a fraction of what it could receive, and it mu
   slot/.style={draw=anticipate!70!black, minimum width=0.52cm, minimum height=0.42cm, inner sep=0pt,
                line width=0.4pt},
   tier/.style={draw=black!35, rounded corners=3pt, line width=0.5pt, inner sep=5pt},
-  tierlab/.style={font=\sffamily\scriptsize\bfseries, text=black!80, anchor=south west, inner sep=1pt}]
+  tierlab/.style={font=\sffamily\scriptsize\bfseries, text=black!80, anchor=south west, inner sep=1pt},
+  dtag/.style={rounded corners=1.2pt, font=\sffamily\tiny\bfseries, inner sep=1.3pt, text=black,
+               fill=anticipate!30, draw=anticipate!80!black, anchor=south west, yshift=0.6pt}]
   % ---------- client ----------
   \node[bx, minimum width=1.7cm] (trk) at (1.0,2.2) {Head / gaze\\tracker};
   \node[bx, minimum width=1.7cm] (pred) at (3.7,2.2) {Viewport\\predictor};
@@ -23,6 +25,9 @@ An immersive client displays only a fraction of what it could receive, and it mu
   \node[anchor=west, inner sep=0pt] at ([xshift=4pt]buf.west) {Buffer};
   \foreach \i/\q in {0/60,1/45,2/30,3/18,4/8} {
     \node[slot, fill=anticipate!\q] (s\i) at (4.2+\i*0.64,0.0) {};}
+  \node[dtag] (tp) at (pred.north west) {1 What to predict};
+  \node[dtag] (tf) at (abr.north west) {2 What to fetch};
+  \node[dtag] (tb) at (buf.north west) {3 Where to keep it};
   \draw[data] (trk) -- node[note, above] {pose} (pred);
   \draw[data] (pred) -- node[note, below] {$P$(seen)} (abr);
   \draw[data] (buf.west) -- (dec.east);
@@ -35,95 +40,108 @@ An immersive client displays only a fraction of what it could receive, and it mu
   \node[note, below=0pt of hz] (hzn)
     {deep $B$ absorbs throughput dips but needs\\far predictions (viewport accuracy 90\% at\\0.2~s, 35\% at 3~s); shallow $B$ stalls on dips};
   \begin{scope}[on background layer]
-    \node[tier, fit=(trk)(abr)(dec)(buf)(hzn)] (cl) {};
+    \node[tier, fit=(trk)(abr)(dec)(buf)(hzn)(tp)(tf)] (cl) {};
   \end{scope}
   \node[tierlab] at ([yshift=1pt]cl.north west) {Client (headset or phone)};
   % ---------- edge ----------
-  \node[bx, minimum width=2.4cm] (pf) at (10.4,2.2) {Prefetcher\\(aggregate predictions)};
-  \node[bx, minimum width=2.4cm] (cache) at (10.4,0.0) {Edge cache\\tiles / cells};
+  \node[bx, minimum width=2.4cm] (pf) at (10.8,2.2) {Prefetcher\\(aggregate predictions)};
+  \node[bx, minimum width=2.4cm] (cache) at (10.8,0.0) {Edge cache\\tiles / cells};
+  \node[dtag] (tc) at (cache.north west) {3 Where to keep it};
   \begin{scope}[on background layer]
     \node[tier, fit=(pf)(cache)] (ed) {};
   \end{scope}
   \node[tierlab] at ([yshift=1pt]ed.north west) {Edge / access};
-  \node[bx, minimum width=2.4cm, fill=black!4, draw=black!45] (oth) at (11.0,4.1) {Other viewers\\of the same content};
+  \node[bx, minimum width=2.4cm, fill=black!4, draw=black!45] (oth) at (11.4,4.1) {Other viewers\\of the same content};
   \draw[req] (oth.south) -- node[note, right] {requests} (oth.south |- ed.north);
-  \draw[data] (pf) -- node[note, right] {warm} (cache);
+  \draw[data] ([xshift=0.8cm]pf.south) -- node[note, left] {warm} ([xshift=0.8cm]cache.north);
   \node[note, anchor=west, align=left] at ([xshift=4pt]oth.east)
     {hit ratio rises with\\cross-user viewport overlap};
   % ---------- origin ----------
-  \node[bx, minimum width=3.0cm, minimum height=2.95cm] (org) at (14.7,1.1) {};
+  \node[bx, minimum width=3.0cm, minimum height=2.95cm] (org) at (15.1,1.1) {};
   \node[anchor=north, inner sep=2pt, align=center] at (org.north)
     {Origin / CDN\\[-1pt]{\tiny tiles $\times$ quality $\times$ 1--3~s segments}};
   \foreach \q/\yy/\lab in {55/1.6/high, 30/1.1/mid, 12/0.6/low} {
     \foreach \c in {0,1,2,3} {
-      \node[slot, fill=anticipate!\q, minimum width=0.38cm, minimum height=0.36cm] at (13.75+\c*0.42,\yy) {};}
-    \node[font=\sffamily\tiny, anchor=west] at (15.45,\yy) {\lab};}
-  \node[font=\sffamily\tiny, text=black!75] at (14.7,-0.05) {6DoF: 3D cells $\times$ LoD};
+      \node[slot, fill=anticipate!\q, minimum width=0.38cm, minimum height=0.36cm] at (14.15+\c*0.42,\yy) {};}
+    \node[font=\sffamily\tiny, anchor=west] at (15.85,\yy) {\lab};}
+  \node[font=\sffamily\tiny, text=black!75] at (15.1,-0.05) {6DoF: 3D cells $\times$ LoD};
   % ---------- flows between tiers ----------
   \draw[req] (abr.east) -- node[note, below] {tile\\requests} (pf.west |- abr.east);
   \draw[req] (pf.east) -- node[note, above] {prefetch} (pf.east -| org.west);
   \draw[req] ([yshift=5pt]cache.east) -- node[note, above] {miss} ([yshift=5pt]cache.east -| org.west);
-  \draw[data] ([yshift=-6pt]cache.east -| org.west) -- node[note, below] {segments} ([yshift=-6pt]cache.east);
+  \draw[data] ([yshift=-6pt]cache.east -| org.west) -- node[note, below, pos=0.4] {segments} ([yshift=-6pt]cache.east);
   \draw[data] (cache.west) -- node[note, above] {tiles (hit)} (buf.east);
   % legend
-  \draw[data] (12.4,-1.4) -- ++(0.6,0) node[note, right=1pt] {content};
-  \draw[req] (14.2,-1.4) -- ++(0.6,0) node[note, right=1pt] {requests};
+  \draw[data] (12.8,-1.4) -- ++(0.6,0) node[note, right=1pt] {content};
+  \draw[req] (14.6,-1.4) -- ++(0.6,0) node[note, right=1pt] {requests};
 \end{tikzpicture}
-\caption{Viewport-adaptive delivery of tiled 360-degree or volumetric content across client, edge and origin. Each decision is a bet on where the user will look: the buffer length fixes how far ahead the predictor must see, and the edge cache pays off only when viewers' viewports overlap.}
+\caption{Viewport-adaptive delivery of tiled 360-degree or volumetric content across client, edge and origin, with the three anticipation decisions marked. Each decision is a bet on where the user will look: the buffer length fixes how far ahead the predictor must see, and the edge cache pays off only when viewers' viewports overlap.}
 \label{fig:anticipate-arch}
 \end{figure}
 
-\subsection{Viewport-adaptive streaming: spending bits where the user looks}
+\subsection{What to predict: horizon against accuracy}
 
-Tiled delivery of 360-degree video saves bandwidth, and the saving shrinks as the test becomes realistic: from up to 72\% with a scripted viewport to 26--35\% for Flare on phones over commercial LTE (\cref{tab:anticipate-savings}). The saving is paid for twice. Tiling costs coding efficiency, a median 7.3--10.4\% for 1-s tiles \cite{W2896840651} and up to 37.3\% for an 8$\times$5 grid \cite{W2623784065}; decoding many tiles raised Flare's phone CPU load from 18\% to 58\% \cite{W2896840651}. Prediction error is the main limiter, so controllers hedge: 360ProbDASH fetched tiles in proportion to their viewing probability and raised viewport PSNR by about 39\% \cite{W2766324256}.
+Prediction trades horizon for accuracy, and the right target depends on what the content lets the user do. For 3DoF video the target is head orientation, from which the viewport follows. For volumetric content it is the full 6DoF pose, because position, distance and occlusion change what is visible. Gaze narrows the target to the foveal region, while content and other viewers supply priors that do not depend on the user's own history. Accuracy falls steeply with horizon. On a 130-user trace set, Flare's best predictor reached median accuracies of 90.5\%, 72.9\%, 58.2\% and 35.2\% at 0.2, 0.5, 1 and 3~s \cite{W2896840651}, and a cross-dataset benchmark found no algorithm accurate much beyond 300~ms \cite{W3089527252}. Head motion is predictable over 100--500~ms \cite{W2585813514}; streaming buffers want seconds.
 
-How the controller should be built is contested. Deep reinforcement learning, used by about a quarter of the cell, reports 20--30\% gains over heuristics \cite{W2920378308,W3159074940}; BOLA360, a buffer-based controller with a near-optimality proof and no training, reports 6--110\% \cite{W4394890851}. The two families have never been compared on shared traces, and learned policies degrade on unseen viewing patterns and networks \cite{W4403826584,W4400409717}. Both optimise an assumed objective, a hand-weighted sum of viewport quality, rebuffering and switches. No abstract in the cell names an ITU-T QoE model, although tile extensions of P.1203 and P.1204.3 exist \cite{W3200608537,W3168206114}, and a database of 378 viewport videos found that mainstream quality models fail for viewport-adaptive streams \cite{W4402916896}.
+Three families of predictors address this gap. \emph{Extrapolators} (persistence, linear regression, Kalman filters) assume that motion stays smooth over the horizon; they need no training and cost almost nothing, and Kalman filters are the usual choice for 6DoF pose in cloud volumetric rendering \cite{W3045776341}. \emph{Learned sequence models} (LSTM, GRU, transformer) learn motion patterns from the user's past trajectory; VPT360, for instance, uses only the scanpath \cite{W4251137679}. \emph{Content-aware and cross-user predictors} add what a trajectory cannot know: saliency and motion maps of the frame \cite{W2624991012}, gaze \cite{W4387968308}, or the paths of earlier viewers. Earlier viewers are the strongest long-horizon signal for on-demand content. Cross-user prediction raised accuracy by 20.2 percentage points \cite{W2896449077}, clustering users by fixation added 15\% precision over linear regression \cite{W2897460799}, and other users' paths helped most at 4--10~s \cite{W2963428739}. Live content has no such history and relies on online learning or object semantics \cite{W4243538177,W3141438256}. Interactive XR has neither future frames nor other viewers, so these results do not transfer to it.
 
-Most of this evidence comes from one on-demand client on an emulated link. Live streaming removes the pre-encoded ladder: YouTube Live delivered 360-degree streams with 4.2--44.2~s camera-to-display delay depending on mode \cite{W4361857501}. Multicast exploits similar head motion across viewers and saved over 50\% \cite{W2725312916}, but adaptation for several headsets behind one bottleneck has reached users in no study. Wireless access is the largest blind spot: only two abstracts in the cell use commercial cellular traces \cite{W3021314748,W2810704880}, although mmWave variability already demands new mechanisms such as band switching \cite{W3195004621}.
+Whether learned models beat simple ones is contested. On the Tsinghua dataset, persistence (keep the current viewport) reached a hit rate of 0.8355, against 0.8402 for a sequence-to-sequence model and 0.8464 for an LSTM \cite{W2963428739}. For 6DoF pose, simple statistical models performed comparably well \cite{W4379805466}. Learned models report large gains mostly over other learned models: a fusion transformer reached an average precision of 0.954 at 1~s against 0.901 for the previous best, but on a random split that placed the same videos and users in training and test \cite{W4387148495}. While extrapolation baselines are missing and splits are not disjoint by video and user, nobody can say how much of the reported accuracy is generalisation. A second assumption is that a point estimate is enough. The fetcher needs a distribution to size its margin. Predicting the predictor's own deviation saved 45\% of bandwidth at under 0.1\% failure \cite{W2585813514}, and predictors that output several weighted futures exist \cite{W4280601181}, yet calibration of these probabilities is rarely reported.
 
 \begin{table}[t]
 \centering\small
-\caption{Bandwidth saved by viewport- and visibility-adaptive delivery, ordered within each content type from idealised to realistic evaluation. The saving falls as the viewport and the network become real.}
-\label{tab:anticipate-savings}
-\begin{tabularx}{\linewidth}{@{}lXrl@{}}
+\caption{Families of approaches for the three anticipation decisions. Each family wins under its own assumption; none dominates once that assumption fails.}
+\label{tab:anticipate-families}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.3cm}>{\raggedright\arraybackslash}p{2.05cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
 \toprule
-Content & Condition & Saving & Source\\
+Decision & Family & Idea & Assumes & Wins when & Limit\\
 \midrule
-360-degree & Perfect knowledge of future motion (bound) & 80\% & \cite{W2585813514}\\
-360-degree & Scripted viewport, against all tiles at high quality & up to 72\% & \cite{W2524582890}\\
-360-degree & HEVC tiles, static viewport / recorded head motion & 65\% / $>$40\% & \cite{W2623784065}\\
-360-degree & Predicted motion with redundancy, $<$0.1\% failure & 45\% & \cite{W2585813514}\\
-360-degree & Phones on commercial LTE, 4 users, 3 videos & 26--35\% & \cite{W2896840651}\\
-Volumetric & Gaze-driven delivery on HoloLens~2 & up to 67\% & \cite{W4399323898}\\
-Volumetric & Visibility-aware, commercial 5G, headset / phone users & 40\% / 10\% & \cite{W3021314748}\\
+\multirow{3}{=}{Predict} & Extrapolators & Persistence, linear or Kalman continuation of pose & Smooth motion over the horizon & Horizon $<$0.5~s; no training data & Blind to content and to sudden turns\\
+ & Learned sequence & LSTM or transformer over past trajectory & Training users and videos resemble test ones & Mid horizons on familiar content & Small margin over persistence; leakage-prone splits\\
+ & Content-aware, cross-user & Saliency, gaze or earlier viewers as priors & Content and viewers are shared & On-demand video at 2--10~s horizons & No prior for live or interactive XR\\
+\midrule
+\multirow{3}{=}{Fetch} & Heuristic, buffer-based & Rules map buffer level and view probability to quality & Buffer reflects throughput & Unknown or shifting networks & Hand-tuned; no notion of optimum\\
+ & Optimisation & Rate-utility allocation over tiles, cells or LoD & Accurate throughput and view probabilities & Good estimates; 6DoF visibility known & Fragile when estimates are wrong\\
+ & Learned (RL) & Policy learned from trace replay & Deployment matches training traces & Stable, well-sampled conditions & Degrades on unseen users and networks\\
+\midrule
+\multirow{3}{=}{Keep} & Popularity cache & LRU or LFU on independent tiles & Requests repeat as whole objects & Large caches; standard HTTP edges & Ignores viewport overlap\\
+ & Viewport-aware cache, prefetch & Place tiles or objects by predicted viewing & Viewers' attention overlaps & Popular on-demand content & Gains shown only against popularity baselines\\
+ & Shared delivery & Multicast or coded caching of common parts & Synchronised, similar requests & Co-located viewers of one stream & Asynchrony and subpacketisation\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Six degrees of freedom: adapting volumetric scenes}
+\subsection{What to fetch: turning probabilities into requests}
 
-Volumetric streaming carries the idea into 6DoF, where the unit of adaptation becomes a 3D cell, an object or a level of detail, and visibility depends on position, distance and occlusion as well as direction. It is the fastest-growing part of rate adaptation. ViVo combined the three visibility tests and saved 40\% of data on average, and up to 80\%, over commercial 5G at SSIM above 0.99 \cite{W3021314748}; the same content saved 40\% for headset users but only 10\% for phone users, so the gain depends on how people move. No general allocation policy has emerged. PCC-DASH found that the best multi-object strategy depends on the scene and the camera path \cite{W2982262421}. The field assumes its navigation traces are representative, yet the newest public set has 15 participants \cite{W4408870156}, and about one volumetric adaptation paper in thirty evaluates with users.
+The fetcher converts a prediction and a throughput estimate into requests: which spatial units, at which quality, for which future segment. It maximises an objective that is assumed rather than measured, a hand-weighted sum of viewport quality, rebuffering and quality switches. Hedging against prediction error is the common core. 360ProbDASH fetched tiles in proportion to their viewing probability and raised viewport PSNR by about 39\% \cite{W2766324256}, and most designs add low-quality margin tiles around the predicted viewport.
 
-Two-way volumetric communication breaks the buffer-based model altogether. Systems reuse low-latency DASH \cite{W3030878847} or WebRTC \cite{W4394890952}; a tiled user-adaptive point-cloud system needed 14~Mbps instead of about 300~Mbps in a 33-user study \cite{W4304091566}. Adaptation in these systems is coupled loosely, if at all, to congestion control, and layered Gaussian-splatting representations are judged on visual fidelity rather than on behaviour under variable throughput \cite{W4402704690}.
+The controllers fall into three families. \emph{Heuristic and buffer-based controllers} map buffer level and view probability to quality with fixed rules; BOLA360 extends buffer-based control to tiles with a near-optimality proof and no training, and reports 6--110\% QoE gains \cite{W4394890851}. \emph{Optimisation-based controllers} solve a rate-utility allocation per segment, often a knapsack over tiles or 3D cells \cite{W2963389850,W4210824758}; they are exact for their model and fragile when its inputs are wrong. \emph{Learned controllers}, mostly deep reinforcement learning, learn the policy from trace replay and report 20--30\% gains over heuristics \cite{W2920378308,W3159074940}. They win on the distribution they were trained on and degrade on unseen viewing patterns and networks \cite{W4403826584,W4400409717}. The buffer-based and learned families have never been compared on shared traces under one objective, so their ranking remains open.
 
-\subsection{Prediction: how far ahead, and against which baseline}
+Six degrees of freedom change the unit of adaptation from a tile to a 3D cell, an object or a level of detail (LoD), and visibility then depends on position, distance and occlusion as well as direction. ViVo combined these three visibility tests and saved 40\% of data on average over commercial 5G at SSIM above 0.99 \cite{W3021314748}. No general allocation policy has emerged: the best multi-object strategy depends on the scene and the camera path \cite{W2982262421}, and the newest public navigation traces come from 15 participants \cite{W4408870156}.
 
-The prediction horizon couples the two halves of the controller (\cref{fig:anticipate-arch}). A deep buffer absorbs throughput dips but forces the system to predict seconds ahead; a shallow buffer needs only short predictions but stalls when throughput drops. Accuracy falls steeply with horizon: Flare's best predictor reached median accuracies of 90.5\%, 72.9\%, 58.2\% and 35.2\% at 0.2, 0.5, 1 and 3~s \cite{W2896840651}, and a cross-dataset benchmark found no algorithm accurate much beyond 300~ms \cite{W3089527252}. For on-demand content, earlier viewers are the strongest long-horizon signal: cross-user prediction raised accuracy by 20.2 percentage points \cite{W2896449077}. Live content has no such history and relies on online learning or object semantics \cite{W4243538177,W3141438256}.
+Live delivery removes both the pre-encoded quality ladder and the cross-user history. YouTube Live delivered 360-degree streams with 4.2--44.2~s camera-to-display delay depending on mode \cite{W4361857501}. Two-way volumetric communication breaks the buffer model altogether. Such systems reuse low-latency DASH \cite{W3030878847} or WebRTC \cite{W4394890952}; a tiled user-adaptive point-cloud system needed 14~Mbps instead of about 300~Mbps in a 33-user study \cite{W4304091566}. In these systems adaptation is coupled loosely, if at all, to congestion control (\cref{sec:provision}).
 
-Whether deep models beat simple predictors is the central controversy. On the Tsinghua dataset, persistence (keep the current viewport) reached a hit rate of 0.8355, against 0.8464 for an LSTM \cite{W2963428739}; for 6DoF pose, simple statistical models performed comparably well \cite{W4379805466}. Learned models report large gains mostly over other learned models. A fusion transformer reached an average precision of 0.954 at 1~s against 0.901 for the previous best, but on a random split that placed the same videos and users in training and test \cite{W4387148495}. Fewer than one prediction paper in ten names a persistence, linear or Kalman baseline.
+\subsection{Where to keep it: buffers, caches and shared delivery}
 
-Two further assumptions go untested. Controllers need calibrated uncertainty to size tile margins, yet predictors output point estimates; predicting the predictor's own deviation saved 45\% of bandwidth at under 0.1\% failure \cite{W2585813514}, but no paper the atlas read reports calibration. Accuracy is also assumed to translate into experience, yet closed-loop tests with real systems fell from 9 of 74 prediction papers in 2016--2022 to 1 of 54 in 2023--2026. Pose prediction that hides motion-to-photon (MTP) latency is discussed in \cref{sec:compute}.
+Keeping content close buys the right to be wrong cheaply. The client buffer holds bets already placed; an edge cache holds what other viewers, or this viewer's next head turn, may need; shared delivery sends one copy to many. All three are worth more when viewers' attention overlaps.
 
-\subsection{Caching and prefetching: placing content before it is requested}
+\emph{Popularity caches} (LRU, LFU) treat tiles as independent objects, need no prediction and are what deployed HTTP caches run. \emph{Viewport-aware caches and prefetchers} place tiles by predicted or observed cross-user viewing. Placing tiles by viewport similarity raised the edge hit ratio by at least 40\% over LFU and 17\% over LRU \cite{W2896595273}, and OpCASH covered more than 95\% of the viewport from cache after 24 views while fetching 85\% less data from the origin \cite{W4288370107}. Independent groups replicate the advantage \cite{W3021782077,W3213361583,W4377008005}, but always against popularity baselines rather than an oracle such as Belady's. Prefetching extends beyond video: world-scale AR model retrieval missed 20\% fewer deadlines with ten times fewer wasted bytes \cite{W4379932440}, and volumetric prefetchers have appeared \cite{W4415047817}. \emph{Shared delivery} exploits overlap on the air rather than in storage. Multicast of similar viewports saved over 50\% \cite{W2725312916}, and coded caching promises gains that grow with the number of users, although subpacketisation and the need for synchronised requests may erase them \cite{W4381251523}. Joint designs that also transcode or render at the edge report lower latency in simulation \cite{W2979447669,W4210795263}, a result that holds almost by construction, because the joint problem contains the decoupled one.
 
-Viewport-aware caching beats popularity-only replacement, a result replicated by independent groups but always against weak baselines. Placing tiles by cross-user viewport similarity raised the edge hit ratio by at least 40\% over LFU and 17\% over LRU \cite{W2896595273}. OpCASH covered more than 95\% of the viewport from cache after 24 views and fetched 85\% less data from the origin \cite{W4288370107}. Prefetching extends to AR: world-scale AR retrieval missed 20\% fewer deadlines with ten times fewer wasted bytes \cite{W4379932440}. Joint designs that also transcode or render at the edge report lower latency in simulation \cite{W2979447669,W4210795263}, a result that holds almost by construction, because the joint problem contains the decoupled one.
+Three questions are unresolved. The first is granularity: fixed tiles, variable tiles that rarely recur \cite{W4288370107} and similarity caching over continuous orientations \cite{W3156984197} have never been compared. The second is the interaction with the fetcher: cache hits distort the throughput estimates that DASH clients rely on \cite{W3122351391}, yet most caching designs assume an ideal client. The third is the value of learning, which cannot be settled while XRFlux remains the only shared benchmark \cite{W4409763640}. Beneath all three lies the assumption that hit ratio stands for experience; no XR caching scheme has been evaluated with viewers. 6DoF content, reusable across viewpoints, users and levels of detail, is the natural next target and remains almost unstudied.
 
-Three questions remain open. The first is granularity: fixed tiles, variable tiles that rarely recur \cite{W4288370107}, or similarity caching over continuous orientations \cite{W3156984197} have never been compared head to head. The second is the interaction with adaptation: cache hits distort the throughput estimates that DASH clients rely on \cite{W3122351391}, yet most caching papers assume an ideal client. The third is whether learned cache policies add anything beyond good viewport prediction, which cannot be settled while XRFlux remains the only shared benchmark \cite{W4409763640}. Beneath all three lies the assumption that hit ratio stands for experience. No caching scheme in the atlas has been evaluated with users, and fewer than one caching paper in twenty addresses 6DoF content, which is reusable across viewpoints and users.
+\subsection{One loop: horizon, misprediction and realistic savings}
+
+The three decisions share one variable, the time between commitment and display. A deep buffer absorbs throughput dips but commits bits on predictions seconds ahead; a shallow buffer needs only short predictions but stalls when throughput drops. Buffer length is therefore prediction horizon, and with accuracy falling from 90\% at 0.2~s to 35\% at 3~s \cite{W2896840651}, a deep buffer fills with tiles the user may never see. Short segments ease the tension: users drift by more than 1.3~radians within 5~s, so segments of at most 2--3~s are needed \cite{W2527384707}, and upgrading buffered tiles lets the fetcher revise a bet as the prediction sharpens. An edge cache shortens the effective horizon by moving the commitment closer to display, so caching and prediction are complements, not substitutes. The same horizon reappears in remote rendering, where pose prediction hides the network round trip rather than throughput variation (\cref{sec:compute}).
+
+A wrong bet is paid in one of two currencies. A thin margin lets the user turn into low-quality or blank tiles; a wide margin spends the saving. Tiling adds a fixed cost on top: a median coding overhead of 7.3--10.4\% for 1-s tiles \cite{W2896840651}, up to 37.3\% for an 8$\times$5 grid \cite{W2623784065} (\cref{sec:encode}), and a rise in Flare's phone CPU load from 18\% to 58\% \cite{W2896840651}.
+
+The net saving falls as the evaluation becomes real. Perfect knowledge of future motion bounds it at 80\% \cite{W2585813514}. A scripted viewport, compared with all tiles at high quality, gave up to 72\% \cite{W2524582890}; HEVC tiles saved 65\% with a static viewport and over 40\% with recorded head motion \cite{W2623784065}; prediction with redundancy saved 45\% \cite{W2585813514}; Flare on phones over commercial LTE, with four users and three videos, saved 26--35\% \cite{W2896840651}. The gradient recurs in 6DoF. Visibility-aware delivery of the same content saved 40\% for headset users but 10\% for phone users \cite{W3021314748}, because people move differently on each device, while gaze-driven volumetric delivery on HoloLens~2 reported up to 67\% \cite{W4399323898}. It is established that viewport-adaptive delivery saves a substantial share of bytes. How large that share is on wireless headsets with real viewers, and whether viewers notice it, is not. Most evidence comes from one on-demand client on an emulated link. Only two systems used commercial cellular traces \cite{W3021314748,W2810704880}, mmWave variability already demands mechanisms such as band switching \cite{W3195004621}, and mainstream quality models failed on a database of 378 viewport-adaptive videos \cite{W4402916896}. Several headsets behind one bottleneck, the normal case in a home or a venue, have reached users in no study.
 
 \begin{openproblems}
-\item \textbf{Prediction and adaptation are not validated in closed loop with users.} Real-system tests of predictors fell to 1 of 54 papers after 2022, and ABR objectives are hand-weighted. A tiled player that runs persistence, Kalman and learned predictors under ABR policies over real bandwidth, with a within-subjects rating study, would show whether accuracy rankings survive.
-\item \textbf{No dataset joins head motion, network conditions and ratings from the same session.} Four dataset papers pair head data with network traces and four with ratings; replay removes the viewer's reaction to quality. Live sessions over Wi-Fi and commercial 5G, logging pose, packets and continuous ratings, would close this gap.
-\item \textbf{Adaptation over real wireless access is under-evaluated.} The cell has half the expected 5G papers and two abstracts with commercial cellular traces. Paired head-motion and radio traces from walking and seated users, replayed in emulation and run live, would test whether PHY and MAC hints reduce stalls.
-\item \textbf{6DoF adaptation and caching lack user-validated QoE and realistic navigation traces.} Volumetric streaming grows fastest, yet trace sets have about 15 participants and volumetric caching is almost unstudied. Larger 6DoF traces, paired comparisons of rendered views and a level-of-detail edge cache shared by co-located users are needed.
-\item \textbf{Caching gains have never been shown to users or outside simulation.} No caching paper has users, and none of the coded, D2D or UAV caching papers uses traces or a testbed. An unmodified HTTP edge cache serving tiled DASH, comparing LRU, viewport-aware and Belady policies with viewers, would quantify perceptible benefit.
+\item \textbf{Do predictor rankings survive in closed loop?} Persistence nearly matches learned predictors offline, and accuracy is rarely tied to streaming outcome. A tiled player running extrapolators and learned predictors under the same controller, over real bandwidth, with video- and user-disjoint splits and a within-subjects rating study, would show whether accuracy gains reach viewers.
+\item \textbf{Can calibrated uncertainty replace fixed margins?} Controllers need view probabilities but receive point estimates. Distribution-free calibration wrapped around any predictor, with margins chosen for a target miss rate, would show how much bandwidth honest uncertainty saves.
+\item \textbf{What objective should the fetcher maximise?} Weights of quality, stalls and switches are chosen by hand, and quality models fail on viewport-adaptive streams. Fitting the objective to user ratings, or adopting tile extensions of standard models \cite{W3200608537,W3168206114}, would make controller rankings meaningful.
+\item \textbf{How should adaptation behave over real wireless access and shared bottlenecks?} Paired head-motion and radio traces from Wi-Fi and commercial 5G, replayed and run live with several headsets on one access point, would test whether radio hints and access-point coordination reduce stalls and unfairness.
+\item \textbf{What should an edge keep for 6DoF content, and do cache gains reach viewers?} A level-of-detail cache shared by co-located users, and an HTTP edge serving tiled DASH under popularity, viewport-aware and Belady policies with viewers, would show whether hit-ratio gains are perceptible.
 \end{openproblems}

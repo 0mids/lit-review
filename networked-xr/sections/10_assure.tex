@@ -1,17 +1,16 @@
 \section{Assuring Experience and Trust: QoE, Security and Privacy}\label{sec:assure}
 
-The previous sections optimise delivery against targets. This section asks how we know that a networked
-XR system is good enough for its users, and safe for them. The function covers \fnAssureN{} papers
-(\fnAssureSh{} of the corpus), and its share rose from \fnAssureEarly{} in 2017--2019 to \fnAssureLate{}
-in 2022--2024. Two cells hold it, with opposite evidence profiles. QoE measurement and modelling
-(\nxrNProbQoeMeasurementModelling{} papers) is the most user-centred cell in the atlas:
-\nxrUsersQoeMeasurementModelling{} of its papers test with users. Security, privacy and trust
-(\nxrNProbSecurityPrivacyTrust{} papers) grew \nxrCagrProbSecurityPrivacyTrust{} a year, yet
-\nxrNoEvalSecurityPrivacyTrust{} of its papers have no evaluation and \nxrUsersSecurityPrivacyTrust{} test
-with users. The argument of this section is that both halves measure the ends of a chain but not its
-links. QoE studies relate network impairments to ratings under conditions that real links do not produce,
-and security studies measure attacks precisely but never price defences in delay or experience.
-\Cref{fig:assure-chain} draws the chain, the attack surfaces and the points where defences add delay.
+The previous sections optimise parts of the loop against targets. This section asks whether the result is
+good enough for its users, and safe for them. Experience and trust share three properties. First, they
+belong to the whole loop, not to any one component. A frame arrives late because of the encoder, the
+scheduler, the pacing of the transport and the reprojection on the headset together, and a pose leaks
+whether it travels to a renderer, a cache or a peer. Second, both are judged at the human end: by what a
+user perceives, and by what an adversary learns about that user. Third, both are usually inferred from
+proxies. Network metrics stand in for experience, and attack accuracy on a captured dataset stands in for
+risk. The section therefore has two halves. On experience, it asks what users actually weigh and how
+experience and traffic are modelled; on trust, it asks what XR traffic reveals and what defences cost.
+\Cref{fig:assure-chain} draws the measurement chain, the attack surfaces and the points where defences
+add delay.
 
 \begin{figure}[t]
 \centering
@@ -38,29 +37,29 @@ and security studies measure attacks precisely but never price defences in delay
 \draw[meas] (a) -- node[lab, below=1pt] {stalls,\\fps} (p);
 \draw[assm] (p) -- node[lab, below=1pt] {rarely\\measured} (t);
 \draw[meas] ([xshift=4mm]n.north) .. controls +(0,0.8) and +(0,0.8) .. node[lab, fill=white, inner sep=1pt]
-  {NetEm user studies, i.i.d.\ impairments:\\loss outweighs delay; 75--90~ms RTT tolerated} ([xshift=-4mm]p.north);
+  {user studies with static impairments:\\loss outweighs delay; 75--90~ms RTT tolerated} ([xshift=-4mm]p.north);
 \draw[assm] ([xshift=-6mm]n.north) .. controls +(0,1.9) and +(0,1.9) .. node[lab, fill=white, inner sep=1pt]
   {requirement tables: 5--20~ms derived from physiology, not tested with users} ([xshift=4mm]t.north);
 % --- system and flows ---
-\node[sys] (h) at (1.05,-2.95) {Headset\\pose, gaze,\\hand motion,\\keystrokes};
+\node[sys] (h) at (1.05,-2.95) {Headset\\pose, gaze,\\hand motion,\\camera};
 \node[sys] (s) at (15.3,-2.95) {Edge / cloud\\renderer,\\state server,\\peers};
 \draw[flow] (s.west |- 0,-2.3) -- (h.east |- 0,-2.3);
 \draw[flow] (h.east |- 0,-2.95) -- (s.west |- 0,-2.95);
 \draw[flow] (h.east |- 0,-3.6) -- (s.west |- 0,-3.6);
 \node[lab, anchor=south west, inner sep=1pt] at (2.2,-2.3)  {frames (down, encrypted)};
 \node[lab, anchor=south west, inner sep=1pt] at (2.2,-2.95) {pose, avatar motion (up)};
-\node[lab, anchor=south west, inner sep=1pt] at (2.2,-3.6)  {viewport, tile requests (up)};
+\node[lab, anchor=south west, inner sep=1pt] at (2.2,-3.6)  {viewport, camera (up)};
 % defences on the flows
 \node[def] (d1) at (7.1,-2.3)  {encryption, padding, jitter};
 \node[def] (d2) at (7.1,-2.95) {DP noise (none for sync)};
 \node[def] (d3) at (7.1,-3.6)  {camouflage, pose noise};
 \draw[-{Stealth[length=1.8mm]}, line width=0.6pt, draw=gapcolor!85!black]
-  (d1.north) .. controls +(0,0.7) and +(0.2,-0.9) .. node[lab, fill=white, inner sep=1pt, pos=0.55] {added delay, uncosted} ([xshift=8mm]n.south);
+  (d1.north) .. controls +(0,0.7) and +(0.2,-0.9) .. node[lab, fill=white, inner sep=1pt, pos=0.55] {added delay, rarely priced} ([xshift=8mm]n.south);
 % adversary and taps
 \node[adv, text width=5.0cm] (x) at (11.6,-5.0) {On-path or co-located adversary};
 \draw[tap] (9.5,-2.3)  -- (9.5,-4.65)  node[pos=0.78, right=0pt, lab, align=left] {app 92.4\%,\\activity 91\%};
-\draw[tap] (11.5,-2.95) -- (11.5,-4.65) node[pos=0.70, right=0pt, lab, align=left] {keystrokes\\97.62\%};
-\draw[tap] (13.3,-3.6)  -- (13.3,-4.65) node[pos=0.50, right=0pt, lab, align=left] {viewport\\re-ID};
+\draw[tap] (11.2,-2.95) -- (11.2,-4.65) node[pos=0.70, right=0pt, lab, align=left] {keystrokes\\97.62\%};
+\draw[tap] (12.75,-3.6)  -- (12.75,-4.65) node[pos=0.50, right=0pt, lab, align=left] {identity,\\scene type};
 % legend and costs
 \node[lab, align=left, anchor=north west, text width=8.3cm] at (0,-4.15) {%
   \tikz[baseline=-0.6ex]\draw[meas] (0,0)--(0.6,0); measured\enspace
@@ -71,123 +70,164 @@ and security studies measure attacks precisely but never price defences in delay
 \end{tikzpicture}
 \caption{Measurement chain and attack surfaces of a networked XR session. Solid arrows are links that user
 or traffic studies have measured, dashed arrows links that are assumed; red taps show measured attack
-accuracies, and defences sit on the flows where they add delay that no testbed study has priced.}
+accuracies, and defences sit on the flows where they add delay that has rarely been priced against the
+frame deadline.}
 \label{fig:assure-chain}
 \end{figure}
 
 \subsection{What users weigh}
-Users of remote-rendered VR weigh loss above delay. On ALVR, round-trip times (RTT) up to 90~ms were
-hardly noticed, while 8\% loss and a 35~Mbps cap degraded experience \cite{W3095344018}. With CloudXR
-(N=30), QoE fell at RTT of 75~ms or more, at loss above 6\%, or at 25~ms combined with 4\% loss
-\cite{W4402156718}. Loss also outweighed delay for presence and emotion on Quest~3 (N=16)
-\cite{W4404916373}. In social XR, RTT up to 77~ms had no significant effect but jitter did
-\cite{W4410087219}. The motion-to-photon (MTP) loop explains part of this. Isolated stalls of up to four
-frames went unnoticed, and reprojection helped from eight frames (N=29) \cite{W4301184864}.
+Users of remote-rendered XR weigh loss and stalls above added delay of tens of milliseconds. Four platforms agree. On ALVR, round-trip times (RTT) up to 90~ms were hardly noticed, while 8\% loss
+and a 35~Mbps cap degraded experience \cite{W3095344018}. With CloudXR (N=30), QoE fell at RTT of 75~ms or
+more, at loss above 6\%, or at 25~ms combined with 4\% loss \cite{W4402156718}. Loss also outweighed delay
+for presence and emotion on Quest~3 (N=16) \cite{W4404916373}, and in social XR an RTT up to 77~ms had no
+significant effect while jitter did \cite{W4410087219}.
 
-The latency budget is contested. Requirement papers set 5--10~ms RTT and 20~ms interaction latency from
-physiology \cite{W3035467795}, a factor of four to ten below what users tolerated. Client-side
-reprojection could reconcile the two, but no study has varied RTT and latency compensation together. A
-second weakness concerns the impairments themselves. None of the \nxrSynXCellQoEUsers{} user-tested papers
-in the QoE cell replays measured network dynamics; all apply constant RTT, independent loss or throttling,
-and real 4G and 5G measurements enter only after the fact, as inputs to models fitted under constant
-impairments \cite{W4405935991}. Wireless loss is bursty and correlated, so the thresholds may not transfer.
+The headset separates two latencies. Rotation latency, the motion-to-photon (MTP)
+delay of turning the head, is served locally by reprojection; network RTT reaches only interaction
+latency, the delay of aiming, grabbing or seeing a peer react (\cref{sec:compute}). Isolated stalls of up to
+four frames went unnoticed, and reprojection helped from eight frames (N=29) \cite{W4301184864}. This
+explains a contested budget. Requirement papers derive 5--10~ms RTT and 20~ms interaction latency from
+physiology \cite{W3035467795}, a factor of four to ten below what users tolerated. Reprojection plausibly
+reconciles the two numbers, but no study has varied RTT and latency compensation together, so the budget
+that edge placement should meet remains open.
 
-Other factors are content and group effects. For volumetric content, frame rate dominated in a
+The evidence also separates the outcomes that the network moves from those it does not.
+Viewport-adaptive delay lowered perceived quality but barely changed presence and left sickness almost
+untouched (20 observers) \cite{W3037996690}. Fewer than 22\% of viewers reported sickness for AR point
+clouds \cite{W4387831705}, and it was ``not an issue'' for 360-degree video \cite{W4212788331}; content
+motion and display, not the network, seem to drive it. For volumetric content, frame rate dominated in a
 102-participant study \cite{W4384703256}, and two quality levels were indistinguishable at 5~m on a
-HoloLens~2 (N=32) \cite{W4387831705}. Cybersickness is contested: fewer than 22\% of viewers reported it
-for AR point clouds \cite{W4387831705}, and it was ``not an issue'' for 360-degree video
-\cite{W4212788331}; content motion and display, not the network, seem to drive it. Group QoE is tested
-almost only in pairs \cite{W4415821547}, with the impairment on one link, so the effect of who is
-delayed in larger groups remains unknown.
+HoloLens~2 (N=32) \cite{W4387831705}. Task performance, the outcome that matters for training or
+teleoperation, is rarely measured beside ratings. Group effects are tested almost only in pairs with the
+impairment on one link \cite{W4415821547}. Players blamed their opponent for their own delay
+\cite{W2954564389}, and loading avatar and world models congested shared networks as groups grew
+\cite{W4388235501}; who is delayed in a larger group, and how the others judge it, is unknown
+(\cref{sec:connect}).
 
-\subsection{Models, standards and traffic}
-Objective models are established for coding impairments and unproven for network ones. PSNR tracks
-MOS for 360-degree video \cite{W2741833902}, colour PSNR correlated at 0.84 for point
-clouds \cite{W4387831705}, and the ITU-T P.1203 and P.1204.3 bitstream models have been extended to tiled
-streaming \cite{W3200608537}. Learned models fit well but locally. A cloud VR gaming model
-reached PLCC 0.93 and raised interaction quality by 1.20 MOS when used to adapt encoding
-\cite{W4400981668}, and regressions on the CloudXR data reached a mean absolute error of 0.14
-\cite{W4405935991}; each was fitted and tested on a few contents. Temporal pooling is missing: P.919 uses
-10~s stimuli while presence needs multi-minute tasks \cite{W4284879755}, and no model pools sub-second
-network events into session QoE. The gap reaches well beyond this cell. ``QoE'' appears in
-\nxrSynQoEtermN{} abstracts, of which \nxrSynQoEtermUsersN{} were tested with users, and an atlas screen
-with two independent readers found 256 streamed-XR papers, mostly on resource allocation and latency, that
-lack an RTT, jitter and loss-to-MOS model yet could use one directly as objective, constraint or evaluator.
+These results share a study design: \emph{static impairments}. Every user study applies constant RTT,
+independent loss or throttling with tools such as NetEm. Real 4G and 5G measurements enter only after the
+fact, as inputs to models fitted under constant impairments \cite{W4405935991}. No study has
+\emph{replayed measured network dynamics} to users. Wireless loss is bursty and correlated, through
+aggregation, scheduling and handover, so thresholds learned under independent loss may not transfer.
 
-Network-side estimators are validated against formulas, not people. PERCEIVE predicted a parametric QoE
-index within 4\%, but its authors state that the index was never checked against ratings
-\cite{W2809912305}; in-network and data-plane estimators share this ground truth. MetaVRadar classified
-metaverse activity from encrypted traffic with 92--100\% true positives without measuring experience
-\cite{W4389609035}.
+\subsection{How experience and traffic are modelled}
+A QoE model maps what can be observed to what a user would report. Four families differ in what they
+observe and what they were validated against (\cref{tab:assure-models}). \emph{Parametric standard models}
+extend ITU-T P.1203 and P.1204.3 to tiled streaming \cite{W3200608537,W3168206114}, with P.919 as the test
+method for short stimuli. \emph{Objective media metrics} are established for coding impairments: PSNR
+tracks MOS for 360-degree video \cite{W2741833902}, VMAF correlated best on a public dataset \cite{W3115841380}, and colour PSNR reached $r=0.84$ for point clouds, depending on content
+\cite{W4387831705}. Neither family sees interaction latency. \emph{Learned estimators} add it but fit
+locally. A cloud VR gaming model reached a Pearson correlation of 0.93 and, when used to adapt encoding,
+raised interaction quality by 1.20 MOS \cite{W4400981668}; regressions on the CloudXR data reached a mean
+absolute error of 0.14 \cite{W4405935991}.
+\emph{Network-side estimators} infer quality from what an operator sees: radio traces, encrypted 360-degree
+traffic from drive tests \cite{W4384158049}, inter-packet gaps in a programmable data plane
+\cite{W4384129861}, or an LSTM on an O-RAN testbed \cite{W4389923869}. They are validated against formulas,
+not people. PERCEIVE predicted a parametric QoE index within 4\%, and its authors state that the index was
+never checked against ratings \cite{W2809912305}.
 
-Traffic measurements show that the application stack, not the link, often sets what users see. WebRTC
-pacing in 5.56~ms batches set frame delay at 6--21~ms over Wi-Fi~6 with an RTT of 1.5~ms
-\cite{W4391506055}. Under 27~Mbps throttling, adaptive bitrate kept cloud VR frame loss at or below 5.12\%
-where a fixed 40~Mbps stream lost 32.51\% \cite{W4210470894}. Models fitted to one stack disagree: the
-3GPP baseline underestimated effective VR bitrate by 25\% \cite{W4399340506}, and the open RiftCat model
-matched mean but not 95th-percentile delay \cite{W3192844644}. Shared worlds need less than is stated:
-Horizon Workrooms used 2--3~Mbps downlink and 0.6~Mbps uplink \cite{W4294643390}, about two orders of
-magnitude below the per-user rates in metaverse visions (\cref{sec:provision}).
+\begin{table}[t]
+\centering\small
+\caption{Families of QoE models for networked XR. Each family is limited by what it observes and by the
+ground truth it was validated against.}\label{tab:assure-models}
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Family & Observes & Validated against & Limit\\
+\midrule
+Parametric standard (P.1203, P.1204.3 tiled) & Bitrate, resolution, stalls, quality switches & Ratings of short streaming stimuli & No interaction latency; 10~s stimuli\\
+Objective media metrics (PSNR, VMAF, colour PSNR) & Decoded pixels or points against a reference & Ratings under coding impairments & Blind to timing; content dependent\\
+Learned estimators & Network and application metrics, game state & Ratings on a few contents in one lab & Fitted and tested on the same small set\\
+Network-side estimators & Encrypted traffic, radio and in-network counters & Parametric indices or activity labels & Never checked against users for interactive XR\\
+Requirement tables & Human perception limits & Physiology, not networked user studies & 4--10$\times$ stricter than tolerated RTT\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-\subsection{Attacks on XR traffic}
-Encrypted XR traffic leaks what users do, and this result is established across platforms and groups.
-Traffic patterns of a mobile AR application located users with 94\% accuracy \cite{W2946752973}. On Meta
-Quest Pro, off-the-shelf classifiers identified applications with 92.4\% accuracy and activities with
-91\%, from less than 10 minutes of traffic per application \cite{W4406880464}. Offloading AR glasses
-reveal the type of physical scene through packet sizes and timing \cite{W7215028895}.
+All four families lack \emph{temporal pooling}. P.919 uses 10~s stimuli, while presence needs multi-minute
+tasks \cite{W4284879755}, and no model pools sub-second network events into the QoE of a session.
 
-Motion data are the sharpest channel. Avatar motion received by an adversary's own client in multi-user VR
-yielded 97.62\% of typed keystrokes, and the attack generalised to four applications
-\cite{W4398796475}. The result
-turns state synchronisation, which broadcasts head and hand poses to every peer, into a leakage channel.
-Platform audits add the provider as observer: about 70\% of Oculus data flows were not properly disclosed
-\cite{W3202887304}.
+Traffic is characterised in two ways. \emph{Measurements of commercial platforms} show that the application stack, not the link, often sets what users see. WebRTC pacing in
+5.56~ms batches set frame delay at 6--21~ms over Wi-Fi~6 with an RTT of 1.5~ms \cite{W4391506055}. Under
+27~Mbps throttling, adaptive bitrate kept cloud VR frame loss at or below 5.12\% where a fixed 40~Mbps
+stream lost 32.51\% \cite{W4210470894}: adaptation converts a throughput shortfall into image quality
+rather than lost frames. Horizon Workrooms used 2--3~Mbps downlink and 0.6~Mbps uplink
+\cite{W4294643390}, two orders of magnitude below the per-user rates in metaverse visions
+(\cref{sec:provision}). \emph{Statistical traffic models} capture constant-bitrate video well: frame size
+follows bitrate over frame rate, and frame intervals follow the frame period with light-tailed or
+log-logistic marginals \cite{W3192844644,W4210470894}. They are open loop, however. The 3GPP baseline
+underestimated effective VR bitrate by 25\% \cite{W4399340506}, and the open RiftCat model matched mean but
+not 95th-percentile delay \cite{W3192844644}. Recent models add head motion \cite{W4414539403} or session states \cite{W4401609527}, but none couples user motion with the stack's rate adaptation and congestion control. Schedulers evaluated
+on such models misjudge capacity in the tail.
 
-\subsection{Defences and their uncosted latency}
-Defences are proposed far more often than they are measured. Of \nxrSynSecLatN{} corpus papers that
-mention both a security term and latency or QoE, \nxrSynSecLatNone{} have no evaluation and
-\nxrSynSecLatUsersN{} were tested with users. Authentication schemes for metaverse avatars and
-tele-surgery are proven in BAN logic, AVISPA or Real-or-Random models and costed in operation counts
-\cite{W4295788720,W3126938564}; no cross-metaverse scheme is measured during the hand-off where
-re-authentication falls. ``Metaverse'' intrusion detectors report 96--99\% accuracy on
-IoT and enterprise datasets that contain no XR flows \cite{W4388011607}. The exceptions are
-line-rate detection in Tofino switches at up to 99\% accuracy with under 5\% of switch resources
-\cite{W4387412865} and the first labelled metaverse attack dataset \cite{W7127620891}. Blockchain is
-contested: a 10-user pilot kept 88~FPS at 142 transactions per second \cite{W7161842864}, while most
-ledger frameworks report no latency at all. Federated learning failed for VR biometric authentication, at below 10\%
-accuracy \cite{W4378696892}.
+\subsection{What XR traffic reveals}
+XR transmits the body. Pose, gaze, viewport requests and camera frames are control signals for the loop
+and, at the same time, behavioural and biometric data. Encryption hides their content but not their size,
+timing or recipients, and four attack surfaces follow.
 
-The privacy--QoE trade-off is modelled, not perceived. Viewpoint leakage persists under federated
-prediction once prediction errors or QoE are uploaded \cite{W4223932369}. Noise remapping reduced the QoE
-loss of privacy noise by 55--100\%, to 0--3\% at maximum privacy \cite{W4396941592}, and client-side pose
-noise lowered re-identification on real 6DoF traces \cite{W7168293765}; none of the 15 papers in this line
-asked users. Selective attribute-based encryption cut encryption and decryption time by up to 50\% and
-80\% and kept volumetric content cacheable \cite{W7124239969}. The transport cost is known only at its
-extremes. Encrypting 1400-byte packets did not fit a 0.35~ms edge budget \cite{W2923086750}; secured VR
-streaming under a flood held about 30--32~ms in simulation \cite{W7161887783}; and padding or jitter alone
-did not stop scene leakage, while combined defences conflicted with QoS \cite{W7215028895}. No
-real-testbed paper reports a defence's latency together with QoE or frame rate. A defence should be
-reported as a point on a privacy--QoE plane: attacker accuracy against added p99 frame latency and
-bandwidth, on a real split-rendering pipeline.
+\emph{Traffic metadata} reveals place and activity, and the result is established across platforms and
+groups. Traffic patterns of a mobile AR application located users with 94\% accuracy \cite{W2946752973}.
+On Meta Quest Pro, off-the-shelf classifiers identified applications with 92.4\% accuracy and activities
+with 91\%, from less than 10 minutes of traffic per application \cite{W4406880464}. \emph{Motion as a biometric} is the sharpest channel. Avatar
+motion received by an adversary's own client in multi-user VR yielded 97.62\% of typed keystrokes across
+four applications \cite{W4398796475}, and Wi-Fi channel state alone yielded 69.75\% \cite{W3161847995}.
+State synchronisation, which broadcasts head and hand poses to every peer, thus becomes a leakage channel
+by design (\cref{sec:connect}). \emph{Viewport requests} identify users because prediction-driven tile
+requests follow individual head motion (\cref{sec:anticipate}); viewpoint leakage persists even under
+federated prediction once prediction errors or QoE are uploaded \cite{W4223932369}. \emph{The camera
+uplink} of offloading AR glasses reveals the type of physical scene through packet sizes and timing
+\cite{W7215028895}, so the split chosen in \cref{sec:compute} is also a privacy decision. Finally, the
+provider is an observer too: about 70\% of Oculus data flows were not properly disclosed \cite{W3202887304}.
+
+\subsection{Defences and their price}
+Every defence spends a resource the loop is short of: delay, bandwidth or prediction accuracy, and the price is rarely measured.
+
+\emph{Encryption} is cheap for small packets and expensive at the tightest budgets. Encrypting 1400-byte
+packets did not fit a 0.35~ms edge budget, while 256-byte packets did \cite{W2923086750}. Selective
+attribute-based encryption cut encryption and decryption time by up to 50\% and 80\% and kept volumetric
+content cacheable \cite{W7124239969}. Secured VR streaming under a flood held about 30--32~ms in
+simulation \cite{W7161887783}. \emph{Obfuscation} hides metadata at a cost in bandwidth or quality. Padding or jitter
+alone did not stop scene leakage, and combined defences conflicted with QoS \cite{W7215028895}.
+Camouflaged tile requests need more resources and degrade prediction \cite{W3207744807}. Noise remapping
+reduced the QoE loss of privacy noise by 55--100\%, to 0--3\% at maximum privacy \cite{W4396941592}, and
+client-side pose noise lowered re-identification on real 6DoF traces \cite{W7168293765}; in this line the
+QoE loss is computed from prediction accuracy, and no user has been asked.
+
+\emph{Authentication} schemes for metaverse avatars and tele-surgery are proven in BAN logic, AVISPA or
+Real-or-Random models and costed in operation counts \cite{W4295788720,W3126938564}. None is measured during an edge or platform
+hand-off, where re-authentication falls on the interaction path (\cref{sec:provision}). \emph{Federated and
+edge processing} keeps raw data local but does not by itself protect it: federated learning for VR
+biometric authentication reached below 10\% accuracy \cite{W4378696892}. \emph{Detection} rarely sees XR
+traffic. ``Metaverse'' intrusion detectors report 96--99\% accuracy on IoT and enterprise datasets that
+contain no XR flows \cite{W4388011607}; the exceptions are line-rate detection in Tofino switches at up to
+99\% accuracy with under 5\% of switch resources \cite{W4387412865} and the first labelled metaverse
+attack dataset \cite{W7127620891}. \emph{Blockchain} is contested: a 10-user pilot kept 88~FPS at 142
+transactions per second \cite{W7161842864}, while most ledger frameworks report no latency at all. What
+decides the question is whether a ledger write sits on the interaction path.
+
+The privacy--QoE trade-off is therefore modelled, not perceived. No testbed study reports a defence's
+latency together with QoE or frame rate. A defence should be reported as a point on a privacy--QoE plane:
+attacker accuracy against added 99th-percentile frame latency and bandwidth, on a real split-rendering
+pipeline.
 
 \begin{openproblems}
-\item \textbf{Network-side QoE estimators are not validated against users.} Estimators predict parametric
-  indices, and none targets interactive remote rendering. A public benchmark pairing encrypted packet
-  traces, client frame logs and per-minute ratings for cloud VR (N$\geq$30) would let estimators be
-  trained and compared.
-\item \textbf{XR traffic models are open loop.} Each is fitted to one stack, one user and short captures,
-  without head motion or rate adaptation, and errs in the tail. A closed-loop generator from several
-  stacks and users, validated against p95 frame delay with 1--12 real headsets, would replace them.
-\item \textbf{Defences are not costed against the frame deadline.} No testbed study reports a defence's
-  latency with QoE or frame rate. Measuring TLS, DTLS and QUIC with padding, bucketing and jitter on
-  split rendering, as attacker accuracy against p99 frame latency, would give providers a price.
-\item \textbf{Authentication is validated symbolically, never during hand-off.} Cross-platform schemes
-  have no measurements. Implementing published schemes and 5G re-authentication on a headset--edge
-  testbed, and counting frames delayed per hand-off, would show which fit the interaction path.
-\item \textbf{Intrusion detectors are trained on traffic without XR flows.} One labelled XR attack
-  dataset exists. Capturing benign and attack XR traffic on an open 5G testbed and testing published
-  detectors across datasets would show whether 96--99\% accuracies transfer.
-\item \textbf{Viewport and pose privacy has no user validation.} QoE losses come from prediction accuracy.
-  A within-subjects study comparing noise, camouflage and client-side prediction at equal re-identification
-  risk, with MOS and sickness scores, would show what users notice.
+\item \textbf{Do network-side estimators predict what XR users report?} Estimators target parametric
+  indices, and none addresses interactive remote rendering. A public benchmark pairing encrypted packet
+  traces, client frame logs and per-minute ratings for cloud VR would let estimators be trained and
+  compared against people.
+\item \textbf{Do thresholds from static impairments hold under real wireless dynamics?} Users have only
+  seen constant RTT and independent loss. A study replaying measured Wi-Fi and 5G traces, with
+  reprojection on and off, would fix the network latency budget for remote-rendered XR.
+\item \textbf{How do sub-second events pool into session QoE, and into group QoE?} No model links bursts of
+  stalls or delay to a multi-minute session, and groups beyond pairs are untested. Scripted burst schedules
+  and asymmetric impairments in groups of four to six would answer both.
+\item \textbf{Can a closed-loop traffic model reproduce the tail?} Models fitted to one stack ignore head
+  motion and rate adaptation, and err at the 95th percentile. A generator coupling pose, adaptation and
+  pacing, validated against several real headsets, would make scheduler studies credible.
+\item \textbf{What does a defence cost against the frame deadline?} Measuring TLS, DTLS and QUIC with
+  padding, bucketing and jitter on split rendering, as attacker accuracy against 99th-percentile frame
+  latency, would give providers a price; the same holds for re-authentication during hand-off.
+\item \textbf{Can state synchronisation share avatars without sharing biometrics?} Poses broadcast to every
+  peer reveal keystrokes, and no synchronisation protocol limits this. A protocol that perturbs or
+  coarsens remote poses, tested for keystroke inference, co-presence and sickness, would close the channel.
 \end{openproblems}
