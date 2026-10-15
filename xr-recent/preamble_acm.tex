@@ -1,0 +1,28 @@
+% Packages and definitions for the acmart (ACM Computing Surveys) build.
+% acmart already loads amsmath, xcolor, graphicx, hyperref, natbib and booktabs; layout and fonts are
+% fixed by the class and are not changed here.
+\usepackage{tabularx,multirow,array}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric,shapes.misc,decorations.pathreplacing}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+
+% Palette shared by all figures (six functional categories; validated for colour-vision deficiency,
+% always paired with text labels).
+\definecolor{encode}{HTML}{2A78D6}
+\definecolor{anticipate}{HTML}{EB6834}
+\definecolor{compute}{HTML}{1BAF7A}
+\definecolor{provision}{HTML}{6250D6}
+\definecolor{connect}{HTML}{E87BA4}
+\definecolor{assure}{HTML}{008300}
+\definecolor{gapcolor}{HTML}{B03A2E}
+
+\setlist{itemsep=1pt,topsep=3pt}
+\graphicspath{{figures/}}
+
+\newtcolorbox{openproblemsbox}{breakable,enhanced,colback=gapcolor!3,colframe=gapcolor!65!black,
+  boxrule=0.6pt,arc=1.5pt,fonttitle=\bfseries\sffamily\small,title={Open problems},
+  left=5pt,right=5pt,top=3pt,bottom=3pt}
+\newenvironment{openproblems}{\begin{openproblemsbox}\small\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=2em,itemsep=2pt]}{\end{enumerate}\end{openproblemsbox}}
