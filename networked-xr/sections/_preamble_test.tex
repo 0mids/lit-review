@@ -1,0 +1,8 @@
+% Minimal compile harness for a single section: pdflatex -interaction=nonstopmode "\def\SEC{sections/05_encode}\input{sections/_preamble_test}"
+\documentclass[11pt]{article}
+\input{preamble}
+\begin{document}
+\input{\SEC}
+\bibliographystyle{unsrtnat}
+\bibliography{data/references}
+\end{document}

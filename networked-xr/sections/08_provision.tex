@@ -1,0 +1,172 @@
+\section{Provisioning the Network: Radio, Resources, Transport and Architecture}\label{sec:provision}
+
+This section asks how access networks, schedulers, transport protocols and system architectures supply
+the rate, delay and reliability that XR needs. Three cells hold the work: resource allocation
+(\nxrNProbResourceAllocation{} papers, \nxrShProbResourceAllocation{} of the corpus), architecture and
+vision (\nxrNProbArchitectureVision{}) and wireless link design (\nxrNProbWirelessLinkDesign{}).
+Resource allocation is the second-largest problem cell and the fastest-growing large one: its share rose
+from \nxrShProbResourceAllocationEarly{} in 2017--19 to \nxrShProbResourceAllocationLate{} in 2022--24.
+Over the same periods the share of papers built on 6G rose from \nxrShTechSixGBeyondFiveGEarly{} to
+\nxrShTechSixGBeyondFiveGLate{}. The three cells differ sharply in how they are evaluated.
+\nxrSimResourceAllocation{} of allocation papers are simulations and \nxrRealResourceAllocation{} use a
+real testbed; \nxrNoEvalArchitectureVision{} of architecture papers have no evaluation at all. Link
+design is the most empirical of the three (\nxrRealWirelessLinkDesign{} real testbeds), but no paper in
+any of the three cells asked users what they perceived. The argument of this section is that provisioning
+research has solved well-posed optimisation problems whose inputs (QoE functions, rendering costs,
+traffic and requirement figures) were assumed rather than measured. Offloading decisions are treated in
+\cref{sec:compute}.
+
+\subsection{Allocating radio, compute and money}
+The design question is how to divide spectrum, power, edge GPU time and caches among XR users so that
+each meets a delay or quality target. The established result is that these resources substitute for each
+other. Caching rendered fields of view and computing on the device can stand in for bandwidth
+\cite{W2887223659,W2945507395}, and joint uplink, downlink and edge allocation saves mobile energy in
+collaborative AR compared with offloading each task on its own \cite{W2608841173}. Shared content
+adds a second lever. Multicasting overlapping 360-degree viewports over mmWave raised HD delivery by
+40--50\% and cut 99th-percentile delay by 17--37\% against unicast, in simulation driven by 50 real head
+traces \cite{W2901851646}; the gain shrinks as viewports diverge, so it is unproven for interactive
+6DoF content.
+
+What is contested is the objective. The cell optimises at least four incompatible QoE constructs: a
+utility of tracking, processing and transmission delay \cite{W2596760110}, regressions of SSIM and VMAF
+\cite{W3214250514}, an attention-weighted ``Meta-Immersion'' score \cite{W4379382423} and weighted sums of
+quality, delay and variation \cite{W4312555471}. Reported gains of 20--37\% are measured in each paper's
+own metric and cannot be compared. Of the \nxrSynXRAQoEN{} allocation papers that optimise QoE, none was
+evaluated with users. The second dispute is method. Reinforcement-learning schedulers beat greedy,
+random and proportional-fair baselines \cite{W2596760110,W4381946597}, while optimisation papers reach
+near-optimal decisions four orders of magnitude faster than a commercial solver \cite{W4324125331}; the
+two camps rarely meet on the same traces.
+
+Much of the rest is assumed. Rendering capacity is a free variable in joint radio--rendering allocation
+\cite{W4379382423}; the only measured GPU figure is economic, a 4~GB vGPU slice that halved cloud-XR
+hourly cost while holding MOS at 4.38 or above \cite{W7115818680}. Metaverse resource markets are the
+extreme case. A learned double Dutch auction reached social welfare within about 5\% of the optimum
+\cite{W3214250514}, and function sharing raised slice admission revenue by up to 80\% \cite{W4381946597},
+but every auction, contract and incentive scheme in the cell uses synthetic valuations and arrivals.
+Standards-aligned work is more realistic about traffic. It uses 3GPP XR models and PDU-set quality of
+service \cite{W4410582180}, and a delay-tracking PDU-set scheduler served 4--5 times more satisfied users
+than PDU-set-aware baselines under scarce resources \cite{W7168254691}. Yet only \nxrSynXRARLStdN{} of
+the \nxrSynXRARLN{} reinforcement-learning allocators use these models. The few testbed studies temper
+the simulated claims. On an O-RAN testbed, latency-estimation control met 10--16.67~ms targets but
+over-provisioned, while packet-size prediction saved resources and lost latency control
+\cite{W4410491869}; a latency-steering xApp freed 15.8\% more resources than an equivalent static slice
+\cite{W4392175446}.
+
+\subsection{The last hop: directional links, Wi-Fi and 5G}
+The link question is how to keep a multi-gigabit, low-delay channel to a moving head. The cell agrees on
+the diagnosis: the tail, not the peak rate, limits XR over directional links. Analysis of THz links gives
+99.999\% reliability at 20~ms with guaranteed line of sight, but with blockage reliability falls to
+68\% at 10~ms and 96\% at 20~ms, and tail delays reach 30--90~ms while the mean stays below 20~ms
+\cite{W3022996137}. At 60~GHz, 3D head motion defeated beam search designed for 2D \cite{W2791171246},
+and commercial hardware lost up to 4.72\% of packets under 45$^\circ$/s rotation \cite{W4401507876}.
+Spatial diversity is the remedy that holds across studies. Dual-beam reception with coordinated access
+points raised reliability by up to 22.8\% on real headset motion \cite{W4409076649}, distributed antennas
+kept 12~Gb/s under full rotation \cite{W4413277491}, and steering beams from the headset's pose helps
+\cite{W4313170175}: predictive beams from a neural radio field halved beam-search error on a 28~GHz array
+\cite{W7204893690}.
+
+On Wi-Fi and 5G the bound is medium access, not physical rate. With frames aligned to the 802.11ad beacon
+interval, eight headsets at 400~Mbit/s met a 1~ms bound \cite{W3081368317}. Wi-Fi~7 multi-link operation
+served 7 rather than 6 AR stations at 80~MHz, and an uninformed greedy policy matched congestion-aware
+ones \cite{W4376480829}. Whether downlink or uplink binds is contested, and depends on the assumed rates
+\cite{W4376480829,W4409221564}; on real hardware, uplink OFDMA with three headsets disrupted tracking
+\cite{W4396853623}. 5G-Advanced link adaptation reports up to 67\% more satisfied XR users
+\cite{W4315777456}, entirely from system-level simulation. Two technologies rest on assumption alone.
+RIS-assisted XR has never run on hardware, and RIS optimisers that take seconds per slot
+\cite{W4318586163} must react within a head rotation \cite{W3207401133}. No XR traffic has crossed a THz
+link: the THz analyses assume Poisson arrivals and fixed-size frames \cite{W3022996137}.
+
+\subsection{Transport over shared bottlenecks}
+Transport decides what reaches the headset when the bottleneck is shared and lossy. Its share of the
+corpus fell from \nxrShTechInternetTransportWebEarly{} to \nxrShTechInternetTransportWebLate{} as
+delivery moved from buffered streaming to interactive rendering, although interactive traffic is less
+able to absorb loss. Users confirm the risk. In cloud VR, RTT up to 90~ms was hardly noticed while loss
+of up to 8\% mattered \cite{W3095344018}; with CloudXR, QoE fell at RTT of 75~ms or more or loss above
+6\% (N=30) \cite{W4402156718}; with Air Link, loss raised cybersickness more than delay did (N=16)
+\cite{W4404916373}. Despite this, only \nxrSynXRendFECN{} remote-rendering papers address forward error
+correction or error resilience \cite{W4399340506,W4409129991}.
+
+Congestion control for XR is nascent. L4S, designed for this traffic, appears in \nxrSynXLFourSN{}
+corpus papers. An L4S pipeline for volumetric conferencing converged 45\% faster than Google congestion
+control and lost no frames where WebRTC lost 3\% \cite{W4408870658}, and L4S has been carried over 5G for
+split rendering \cite{W4401507827}; both studies used controlled bottlenecks with one competing scheme.
+Practice has moved ahead of research. Steam Link carries video and control in one QUIC tunnel
+\cite{W7160626692}, and WebRTC selective forwarding adapted 13--36\% faster than TCP for volumetric
+streams in emulation \cite{W7151958829}. No paper has compared delay-based, loss-based and L4S
+controllers with forward error correction on real cellular or Wi-Fi bottlenecks with cross traffic.
+
+\subsection{Architectures and the figures they carry}
+Architecture papers propose where functions sit (device, edge, cloud, ledger) and state what the network
+must deliver. They agree on the qualitative list (high rate, low delay, reliability, concurrency,
+interoperability) and on edge computing as a necessary tier \cite{W4312940001,W4315497913,W4391305431}.
+The quantitative figures are where they fail. \Cref{tab:provision-requirements} sets stated
+requirements against measured or derived figures; for rates the gap spans two to five orders of
+magnitude. The cause is not error in either source but unstated operating points: an uncompressed light
+field is not a compressed point cloud, and 360-degree video is not avatar state.
+
+\begin{table}[t]
+\centering\small
+\caption{Stated requirements against measured or derived figures. The gaps follow from unstated content
+representation, codec and control loop.}
+\label{tab:provision-requirements}
+\begin{tabularx}{\linewidth}{@{}p{2.3cm}XX@{}}
+\toprule
+Quantity & Stated & Measured or derived \\
+\midrule
+Per-user metaverse rate & 100--250~Mbps \cite{W4313291084,W4312940001}; $\sim$10$^3\times$ 5G
+  throughput \cite{W4391305431} & Horizon Workrooms 2--3~Mbps down, 0.6~Mbps up, +0.5~Mbps per extra
+  user (2--5 users) \cite{W4294643390} \\
+Holographic call & 1--10~Tbps; 6.63~TBps for a light-field display \cite{W4300960574} & 5--100~Mbps
+  for a compressed point cloud over live 5G \cite{W4312662428}; $<$0.2~Mbps for a driven avatar
+  \cite{W7123904049} \\
+Untethered VR link & 15.75--26.25~Gbps uncompressed \cite{W4401507876} & 400~Mbit/s per 4K headset,
+  eight per 802.11ad AP \cite{W3081368317} \\
+Cloud VR bitrate & 3GPP XR traffic model & 25\% higher effective bitrate on a Pico Neo~2
+  \cite{W4399340506} \\
+Interaction latency & 1~ms in \nxrSynOneMsN{} abstracts, \nxrSynOneMsUsersN{} with users & Haptic
+  users tolerated 200~ms with adaptive control \cite{W4200154132}; cloud VR RTT up to 90~ms hardly
+  noticed \cite{W3095344018} \\
+Discomfort threshold & 30~ms \cite{W4313291084} vs $<$20~ms \cite{W4315497913} & Not derived from a
+  user study in either source \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The figures propagate. One survey reproduces another's requirement table with a reliability target
+changed from $1-10^{-6}$ to $1-10^{-5}$ \cite{W4390204075,W4312940001}, and its research agenda reproduces
+a third \cite{W4224330100}; fewer than one survey in twenty in the cell reports a search protocol. The
+apparent consensus is partly one source counted several times. Measured platforms tell a different story:
+throughput, latency and device load on five social VR platforms grew almost linearly with users, because
+servers forward avatar data directly \cite{W4307020344,W4294643390}. The scaling bottleneck is server
+logic, not access capacity, which weakens the case that 5G cannot carry the metaverse.
+
+Two architectural claims are untested. Blockchain is placed in the interactive data path for ownership
+and trust \cite{W4224330100,W4312940001}; \nxrSynXArchChainN{} architecture papers include a ledger,
+\nxrSynXArchChainNoEval{} of them without any evaluation, and none has measured the delay it adds, although one concedes that replication raises delay with users
+\cite{W4320717855}. Network slicing for XR, by contrast, has testbed evidence: AR, cloud gaming and video
+calls were measured under RAN-slice configurations on an O-RAN 5G network \cite{W4386887692}. 6G visions
+rarely map their functions onto the 5G-Advanced XR mechanisms that already exist
+\cite{W4387933382,W4376607343}, so what 6G must add remains unstated.
+
+\begin{openproblems}
+\item \textbf{Allocation objectives are not validated with users.} None of the \nxrSynXRAQoEN{}
+  QoE-driven allocators and no link design was evaluated with participants. A QoE-in-the-loop slicing
+  study on an open 5G testbed, comparing static, latency-target and QoE-model control with ratings and
+  sickness scores, would show which objective matters.
+\item \textbf{Rendering costs in joint radio--GPU allocation are assumed.} Rendering capacity is a free
+  variable in these models. Profiling render and encode time and GPU power on edge hardware, then
+  re-running published allocators under measured costs, would show whether their rankings survive.
+\item \textbf{RIS and THz have never carried XR traffic.} All RIS-for-XR work is simulated, and THz
+  reliability rests on Poisson traffic. A pose-driven RIS prototype at 28 or 60~GHz, measured on frame
+  deadline misses, would test the premise.
+\item \textbf{Requirement figures are not derived from measured traffic.} Stated per-user rates exceed
+  measured ones by up to two orders of magnitude. A traffic atlas of shared-world platforms across user
+  counts and avatar fidelities, compared with 3GPP models, would replace copied tables.
+\item \textbf{Transport and loss resilience are untested on real bottlenecks.} Users weigh loss above
+  delay, yet L4S appears in \nxrSynXLFourSN{} papers. Comparing L4S, delay-based and loss-based control
+  with forward error correction over cellular and Wi-Fi links with cross traffic, reporting p99 frame
+  latency, would fill this.
+\item \textbf{Blockchain latency is uncosted.} No study measures ledger delay against interaction
+  deadlines. A benchmark of centralised, permissioned and rollup ledgers inside a live session would
+  settle whether the ledger belongs in the data path.
+\end{openproblems}

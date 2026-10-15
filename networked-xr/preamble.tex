@@ -1,0 +1,44 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{charter}
+\usepackage[scaled=0.92]{helvet}
+\usepackage[a4paper,margin=2.2cm,headheight=14pt]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,multirow,array}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric,shapes.misc,decorations.pathreplacing}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=green!35!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+
+\input{data/numbers}
+\input{data/synthesis_numbers}
+\input{data/function_numbers}
+
+% Palette shared by all figures (six functional categories; validated for colour-vision deficiency,
+% always paired with text labels).
+\definecolor{encode}{HTML}{2A78D6}
+\definecolor{anticipate}{HTML}{EB6834}
+\definecolor{compute}{HTML}{1BAF7A}
+\definecolor{provision}{HTML}{6250D6}
+\definecolor{connect}{HTML}{E87BA4}
+\definecolor{assure}{HTML}{008300}
+\definecolor{gapcolor}{HTML}{B03A2E}
+
+\setlist{itemsep=1pt,topsep=3pt}
+\setlength{\parskip}{2pt}
+\graphicspath{{figures/}}
+
+\newtcolorbox{openproblemsbox}{breakable,enhanced,colback=gapcolor!3,colframe=gapcolor!65!black,
+  boxrule=0.6pt,arc=1.5pt,fonttitle=\bfseries\sffamily\small,title={Open problems},
+  left=5pt,right=5pt,top=3pt,bottom=3pt}
+\newenvironment{openproblems}{\begin{openproblemsbox}\small\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=2em,itemsep=2pt]}{\end{enumerate}\end{openproblemsbox}}
+\newcommand{\keyfinding}[1]{\begin{tcolorbox}[enhanced,colback=black!3,colframe=black!40,boxrule=0.4pt,arc=1.5pt,left=5pt,right=5pt,top=2pt,bottom=2pt]\small #1\end{tcolorbox}}

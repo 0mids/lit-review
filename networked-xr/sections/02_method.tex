@@ -1,0 +1,91 @@
+\section{Review Method}\label{sec:method}
+
+The review rests on the Networked XR Atlas, whose full protocol, code and intermediate decisions are
+public. Here we summarise the steps that bear on how the evidence should be read. \Cref{fig:prisma} shows
+the flow of records.
+
+\paragraph{Research questions.} (RQ1) How large is the networked-XR literature, and how has its
+composition changed? (RQ2) What does it establish about each function of a networked XR system, and
+with what evidence? (RQ3) How realistically are its claims tested? (RQ4) Which gaps recur across
+functions, and which research would close them first?
+
+\paragraph{Search.} We queried OpenAlex, which indexes journals, proceedings, theses, books and
+preprints. A record qualified if its title or abstract contained one of \nxrQueryXrTerms{} XR phrases
+\emph{and} one of \nxrQueryNetTerms{} networking phrases. The XR side covers virtual, augmented, mixed
+and extended reality, the metaverse, 360-degree and volumetric video, holographic communication,
+telepresence and the tactile internet. The networking side runs from streaming, edge computing and
+remote rendering to 5G, 6G, Wi-Fi, QoE and caching. The XR side deliberately includes media terms. A
+search for ``virtual reality'' alone would miss much of the field, because many papers describe their
+content only as haptic traffic, omnidirectional video or point clouds. The window runs from October 2016
+to October 2026. After removing \nxrDuplicates{} duplicates by identifier, DOI and title, \nxrAfterDedup{}
+records remained.
+
+\paragraph{Screening.} Records were sorted into tiers by how strongly XR and networking terms
+co-occur. In a hand-labelled pilot of \nxrPilotN{} records, the weakest tier held no relevant paper, so
+its \nxrTierCRule{} records were excluded by rule. The other \nxrJevScreened{} records were screened by a
+calibrated classification model against a written scope. A paper was included when transmitting,
+offloading, rendering remotely, caching, synchronising or securing XR content \emph{over a network} was
+its core or a substantial subject. On the decidable pilot records, the inclusion rule reached precision
+\nxrPilotPrecision{} and recall \nxrPilotRecall{}. A second de-duplication pass merged preprints with
+their published versions, and retracted and off-topic records were removed (\nxrRemoved{} in all). The
+final corpus holds \nxrIncluded{} papers: \nxrShareConfPapers{} conference papers, \nxrShareArticles{}
+journal articles, and the rest preprints, theses and chapters.
+
+\begin{figure}[t]\centering
+\begin{tikzpicture}[font=\sffamily\footnotesize,
+  box/.style={draw=black!45,rounded corners=2pt,align=center,minimum height=8.5mm,inner sep=3pt,fill=black!2},
+  side/.style={draw=gapcolor!60,rounded corners=2pt,align=left,inner sep=3pt,fill=gapcolor!4,font=\sffamily\scriptsize},
+  arr/.style={-{Stealth[length=2mm]},black!60,line width=0.6pt}]
+  \node[box,text width=2.6cm] (h) {OpenAlex harvest\\\textbf{\nxrHarvested{}}};
+  \node[box,text width=2.6cm,right=0.55cm of h] (d) {After de-duplication\\\textbf{\nxrAfterDedup{}}};
+  \node[box,text width=2.6cm,right=0.55cm of d] (s) {Screened in\\\textbf{\nxrScreenedIncluded{}}};
+  \node[box,text width=2.6cm,right=0.55cm of s,fill=encode!8,draw=encode!70] (i) {Included corpus\\\textbf{\nxrIncluded{}}};
+  \draw[arr] (h)--(d); \draw[arr] (d)--(s); \draw[arr] (s)--(i);
+  \node[side,below=0.35cm of d,text width=2.6cm] (x1) {Weak tier excluded by rule: \nxrTierCRule{}\\Model-excluded: \nxrExcluded{}\\Borderline: \nxrBorderline{}};
+  \node[side,below=0.35cm of s,text width=2.6cm] (x2) {Duplicate versions, retracted, off-topic: \nxrRemoved{}};
+  \draw[arr] (d.south)--(x1.north); \draw[arr] (s.south)--(x2.north);
+  \node[box,below=0.35cm of i,text width=2.6cm] (l) {Labelled on 5 dimensions\\(all \nxrIncluded{})};
+  \node[box,below=0.25cm of l,text width=2.6cm] (r) {Deep-read: \textbf{\nxrDeepReads{}} in \nxrDeepCells{} cells\\\nxrGaps{} gaps verified};
+  \draw[arr] (i)--(l); \draw[arr] (l)--(r);
+\end{tikzpicture}
+\caption{Flow of records from harvest to analysis. Excluded-record counts are not additive with the
+included count, because borderline records are kept apart and screening ran before the second
+de-duplication pass.}\label{fig:prisma}
+\end{figure}
+
+\paragraph{Labelling.} Every included paper was labelled on five closed dimensions, each with written
+definitions: the \emph{networking problem} it mainly addresses (\nxrNCatProb{} options), the \emph{network
+technology} (\nxrNCatTech{}), the \emph{content type} transmitted (\nxrNCatCont{}), the \emph{method}
+(\nxrNCatMeth{}) and the \emph{evaluation} (\nxrNCatEval{}). \nxrLabJev{} papers were labelled by the
+model and the remaining \nxrLabDirect{} by direct reading of title and abstract. On \nxrRelabCal{} papers
+labelled both ways, the primary labels agree for \nxrRelabAgrMin{}--\nxrRelabAgrMax{} of papers. The
+top-two label sets overlap for \nxrRelabTwoMin{}--\nxrRelabTwoMax{}, so most disagreements concern papers
+that sit between two categories. The labels support counts and trends over hundreds of papers. They do
+not support claims about any single paper, and every paper discussed individually below was read.
+
+\paragraph{Evaluation realism as evidence strength.} Reviews of interventions grade evidence by study
+design. In networking the main threat to a claim is an unrealistic test environment, so we grade evidence
+by \emph{evaluation realism}, from most to least realistic: a real network or testbed with human users; a
+real network or testbed without users; emulation driven by real traces; simulation; analysis alone; and no
+evaluation. Abstracts often blur ``prototype'' and ``emulation'', so this is the least reliable dimension
+(top-1 agreement \nxrAccEval{} against \nxrAccCont{} for content). Differences of a few percentage points
+in realism should not be over-read.
+
+\paragraph{Deep reading and gap verification.} The atlas divides the corpus into \nxrDeepCells{} cells,
+one per networking problem and one per specific content type. In each cell it selected the most
+influential papers, by citations, citations per year and in-corpus PageRank, together with the strongest
+recent papers and the main surveys. In all, \nxrDeepReads{} papers were read and summarised in a fixed
+schema, \nxrDeepFulltext{} of them in full text. A candidate gap was kept only if it passed three tests.
+It had to be meaningful rather than definitionally empty. It had to survive a regular-expression search
+of every included abstract, which corrects for the single-label taxonomy. And the papers that had been
+read had to leave it open. \nxrGaps{} gaps passed, \nxrGapsHigh{} of them with high confidence. The
+open problems that close Sections~\ref{sec:encode}--\ref{sec:assure} are drawn from them.
+
+\paragraph{Threats to validity.} OpenAlex lacks an abstract for \nxrShareNoAbstract{} of the included
+papers. Work that uses none of our XR phrases is missed. The pilot contained only \nxrPilotRelevant{}
+relevant papers, so precision and recall carry wide intervals. A single-label taxonomy undercounts papers
+that span categories, so category sizes count the papers for which a category is \emph{primary}. Selecting
+papers for deep reading by citation favours older work, and a recent-paper quota corrects this only in
+part. Text-search counts depend on how authors word their abstracts, so they are indicative to within a
+few points. Screening and labelling used a language model, and drafts were checked against the source
+texts. Every count in this review is generated by script from the atlas data files.
