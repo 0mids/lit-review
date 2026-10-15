@@ -1,0 +1,60 @@
+\documentclass[acmsmall,screen]{acmart}
+\input{preamble_acm}
+
+\setcopyright{none}
+\acmJournal{CSUR}
+\acmYear{2026}
+
+\begin{document}
+
+\title{Networked Extended Reality since 2023: Closing the Loop between Network and Experience}
+
+\author{Anonymous}
+\affiliation{%
+  \institution{To be completed}
+  \city{}
+  \country{To be completed}}
+
+\begin{abstract}
+Since 2023, networked extended reality (XR) has moved to standalone headsets that stream rendered frames,
+avatars, point clouds and Gaussian splats over Wi-Fi and 5G-Advanced. This review covers what recent work
+has built, measured and learned, with a focus on networking and quality of experience (QoE). User studies
+agree that loss, jitter and stalls hurt more than tens of milliseconds of added delay, but nearly all of
+them apply static impairments to one user or one pair. Measurements of commercial headsets and platforms
+show that the application stack often sets what users see, and that standard XR traffic models
+underestimate real demand. In the radio access, 5G-Advanced makes scheduling aware of video frames through
+PDU sets, and network-assisted rate control, Wi-Fi~7 multi-link operation and robust mmWave beams follow
+the same idea. In transport, L4S, Media over QUIC and selective forward error correction aim at frame
+deadlines rather than throughput, while foveated, split and Gaussian-splat delivery adapt what is sent. We
+group these approaches by the idea they share, state what each assumes, and show that capacity gains are
+almost always counted in packet-delay budgets, not in validated QoE. We close with open research questions
+on replaying real network dynamics to users, on who should own the rate control loop, and on group
+experience.
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+<concept><concept_id>10003033.10003106.10003113</concept_id><concept_desc>Networks~Mobile networks</concept_desc><concept_significance>500</concept_significance></concept>
+<concept><concept_id>10003033.10003079</concept_id><concept_desc>Networks~Network performance evaluation</concept_desc><concept_significance>500</concept_significance></concept>
+<concept><concept_id>10003120.10003121.10003124.10010866</concept_id><concept_desc>Human-centered computing~Virtual reality</concept_desc><concept_significance>300</concept_significance></concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Networks~Mobile networks}
+\ccsdesc[500]{Networks~Network performance evaluation}
+\ccsdesc[300]{Human-centered computing~Virtual reality}
+
+\keywords{extended reality, quality of experience, split rendering, 5G-Advanced, PDU set, Wi-Fi 7,
+millimetre wave, L4S, Media over QUIC, volumetric video, Gaussian splatting, cloud VR gaming, social XR}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_experience}
+\input{sections/03_measurement}
+\input{sections/04_radio}
+\input{sections/05_transport}
+\input{sections/06_outlook}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{data/references}
+\end{document}

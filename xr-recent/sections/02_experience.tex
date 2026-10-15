@@ -1,0 +1,46 @@
+\section{What Users Experience}\label{sec:qoe}
+
+\subsection{Loss and jitter outweigh delay}
+Recent user studies agree on one ordering: loss, jitter and stalls hurt more than tens of milliseconds of
+added delay. With Nvidia CloudXR and a first-person shooter (N=30), QoE fell at a round-trip time (RTT) of
+75~ms or more, or at loss above 6\%; combined, 25~ms with 4\% loss was already harmful \cite{W4402156718}.
+In a social XR application (N=28), RTT up to 77~ms had no significant effect, while loss above 2\% at
+higher RTT did, and even jitter of one standard deviation degraded QoE at RTTs beyond 52~ms
+\cite{W4415822410}. With a Quest~3 streaming over Air Link (N=16), loss harmed experience more than delay
+across almost all measured aspects \cite{W4404916373}. In Rec Room and VRChat, the virtual environment
+froze under loss but not under latency \cite{W4404103205}.
+
+The ordering follows from how the headset splits latency. Reprojection serves head rotation locally, so
+network delay reaches only \emph{interaction latency}: aiming, grabbing, or seeing a peer react. That
+budget depends on timing structure, not on RTT alone. In split-rendered gaming, 90 and 120~fps tolerated
+up to 6~ms of network delay before responsiveness suffered, and 60~fps was the better choice when delay
+was high \cite{W4401943426}. The budget is therefore \emph{contested}: requirement statements still ask for
+sub-20~ms end-to-end latency \cite{W7126117938}, while users of cloud and social XR tolerated RTTs near
+75~ms. Cybersickness depends on content more than on the network: loss raised sickness in Beat Saber but lowered presence in Cubism \cite{W4404916373}, and at most 21\% of viewers
+reported dizziness for point clouds in AR \cite{W4387831705}.
+
+\subsection{Experience is social}
+Multi-user sessions add effects no single-user study can show. In collaborative VR (20 participants in
+pairs), users told impaired from unimpaired sessions but not latency from bursts, task time and sickness
+scores did not change, and the user's role shaped perception \cite{W4392600587}. Impairments also raised synchronisation traffic four- to fivefold through retransmissions. Avatars
+expose a fidelity trade-off. With 40 participants on Quest~Pro headsets, a light cartoon avatar gave the
+highest QoE under impairment; a humanoid avatar that replicates facial expressions lost more under delay,
+yet seeing a partner's face softened the loss \cite{W4415821547}. Standards lag behind: ITU-T leads in
+modelling social aspects of QoE, but 3GPP, ITU-T and ETSI efforts remain fragmented and centred on system
+metrics \cite{W4415822422}.
+
+\subsection{Predicting experience}
+Three families of models map what can be observed to what users would report.
+\emph{Opinion-trained models} fit ratings from a lab study: cloud VR gaming models reached a Pearson
+correlation of 0.93 \cite{W4400981668}, and regression models for a VR shooter a mean absolute error of 0.14 \cite{W4405935991}. Fed with real traces, the latter predicted a mean opinion
+score (MOS) of only 2.5--3.0 over 4G and 5G against 4.2--4.4 over wired access. \emph{Content-quality
+metrics} cover new media: colour PSNR correlated with point-cloud ratings at 0.84 \cite{W4387831705}, but
+common metrics missed the effect of viewing behaviour on volumetric video \cite{W4386172458}.
+\emph{Network-side estimators} infer QoE from what an operator sees, such as encrypted 360-degree traffic
+over HTTPS and QUIC in 4G and 5G drive tests \cite{W4384158049} or QoS counters on an O-RAN testbed
+\cite{W4389923869}, but are validated against application metrics, not users.
+
+All three families inherit one study design: \emph{static impairments}. Emulators apply a constant RTT,
+independent loss or a fixed jitter distribution to 16--40 participants, and real 4G and 5G measurements
+enter only afterwards, as inputs to models fitted under constant conditions
+\cite{W4405935991,W4415822410}. That thresholds learned this way hold under bursty, correlated wireless loss is \emph{assumed}.

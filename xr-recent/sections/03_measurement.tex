@@ -1,0 +1,34 @@
+\section{Measuring Real Systems}\label{sec:measure}
+
+\subsection{Commercial headsets and platforms}
+Measurements of commercial systems show that the application stack, not the link, often decides what
+users see. On Apple Vision Pro, FaceTime sends a spatial persona over QUIC at about 0.7~Mbps; the bitrate
+matches face and hand keypoints, not a mesh, which would need over 100~Mbps at 90~fps
+\cite{W4403981191}. The same study found no rate adaptation: with the uplink capped at 0.7~Mbps the
+persona disappeared. Servers were chosen near the session initiator, which gave RTTs above 100~ms within
+the United States, and downlink traffic grew almost linearly from two to five users because servers
+forward each persona. On a Quest~Pro, the old 2.4~GHz Wi-Fi~4 kept 99\% of samples at or above 65~Hz
+against a 72~Hz target, while wireless offloading drained the battery 15\% faster than local rendering
+\cite{W4362489903}. One 45-minute social VR session on Multiverse touched 87 service domains, and its time-critical state ran as UDP at about
+30 packets per second upstream \cite{W4389609035}. Steam Link on a Quest~3 carries video and control in one
+QUIC tunnel, with a bursty downlink and a periodic uplink; scene complexity set the mean throughput, the
+player's style its variance \cite{W7160626692}.
+
+\subsection{Access networks in practice}
+In-situ tests expose interactions that link-level figures hide. One Wi-Fi~6 access point served three
+headsets at up to 100~Mbps each with latency near 50~ms, but uplink OFDMA delayed tracking packets and
+thus rendering \cite{W4396853623}. With Unity Render Streaming over Wi-Fi~6, the WebRTC pacer released
+frames in 5.56~ms batches and added 6--21~ms of frame assembly delay although the RTT was 1.5~ms
+\cite{W4391506055}. Cellular access trades direction: a 5G standalone edge setup gave a steadier downlink
+and better mobility than Wi-Fi~6, but higher uplink latency on the control channel \cite{W4399563011}, and
+a local 5G test network measured 3.4--4.1~ms one-way delay downlink against 6.4--14.8~ms uplink
+\cite{W7126117938}. In these studies the uplink, which carries pose and input, was the weaker direction.
+
+\subsection{Testing the traffic models}
+The simulations in \cref{sec:radio} rest on traffic models, and measurements now test them. For cloud VR on
+a Pico Neo~2, the 3GPP baseline underestimated the effective bitrate by 25\% \cite{W4399340506}. Frame
+sizes in ALVR depend on head angular velocity, so a model that includes motion predicted them better
+\cite{W4414539403}. Modern 6DoF gaming reached 251.9~Mbps and 120~Hz, beyond the fixed 50~Mbps and 60~Hz
+many models assume \cite{W4411688686}, and cloud-rendered AR traces showed heavy-tailed packet sizes and
+loss that is rare on average but arrives in bursts \cite{W7202080971}. Real XR traffic is larger, burstier and more motion-dependent than baseline models assume, so
+the capacity figures of \cref{sec:radio} are likely optimistic.

@@ -43,7 +43,7 @@ def main():
         vf = "booktitle" if kind in ("inproceedings", "incollection") else "school" if kind == "phdthesis" else "journal"
         doi = (r.doi if isinstance(r.doi, str) else "").replace("https://doi.org/", "")
         out.append(f"@{kind}{{{key},\n  author = {{{authors or 'Anonymous'}}},\n"
-                   f"  title = {{{{{tex_escape(r.title)}}}}},\n  {vf} = {{{tex_escape(r.venue or 'n.p.')}}},\n"
+                   f"  title = {{{{{tex_escape(r.title)}}}}},\n  {vf} = {{{tex_escape(r.venue if isinstance(r.venue, str) and r.venue.strip() else 'n.p.')}}},\n"
                    f"  year = {{{int(r.year) if r.year == r.year else ''}}},\n"
                    + (f"  doi = {{{doi}}},\n" if doi else "") + "}\n")
     (HERE / "data" / "references.bib").write_text("\n".join(out))

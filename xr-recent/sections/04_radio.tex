@@ -1,0 +1,65 @@
+\section{The Radio Access}\label{sec:radio}
+
+The common idea of radio work since 2023 is to change the unit of service from the packet to the video
+frame. A frame that misses its deadline is worthless even if most of its packets arrive. \Cref{tab:families} classifies the
+resulting families together with those of \cref{sec:transport}.
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Families of network and delivery mechanisms for XR since 2023, what they were evaluated on, and
+whether users confirmed the gain. ``Proxy'' means a network or image metric stands in for QoE.}
+\label{tab:families}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{2.1cm}@{}}
+\toprule
+Family & Idea & Evaluated on & QoE validated?\\
+\midrule
+Frame-aware scheduling & Schedule PDU sets against a frame deadline & System-level simulation & No; PDB met\\
+Coexistence and power & Limit interference; sleep between frames & System-level simulation & No\\
+Network-assisted rate & Network recommends a rate & Simulation, testbed & No; outage\\
+Wi-Fi~7 MLO, mmWave & Several links; beams that follow the head & Simulation, lab hardware & No; delay, loss\\
+Early congestion signals & L4S/ECN, in-network dropping & Emulation, testbeds & Proxy; frame loss\\
+QUIC and MoQ delivery & Streams, delivery timeouts & Emulation & Proxy; stalls\\
+Selective protection & FEC on what matters, neural repair & Loss traces & Proxy; freezes\\
+Perception-driven sending & Foveation, QoE-model encoding & Prototypes with users & Yes, small labs\\
+Volumetric, splat delivery & Layered, progressive, shared content & Datasets, prototypes & Mostly proxy\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Making the radio frame-aware}
+\emph{PDU sets} are the standard vehicle. 3GPP Release 18 defines a PDU set as the smallest group of
+packets that carries one frame, together with its relative importance, and lets the radio network apply
+QoS handling to it \cite{W4410582180}. Release 19 adds burst signalling, expedited transfer of
+latency-critical content and guidance on importance values \cite{W7127418717}, plus radio features such
+as latency-aware uplink prioritisation, delay status reports and uplink rate control through application
+adaptation \cite{W7164211432}. \emph{Frame-aware schedulers} exploit this information. A PDU-set scheduler
+raised XR capacity by up to 45\% at unchanged broadband throughput \cite{W4402156740}, and an uplink
+least-slack-time scheduler gained 15\% capacity and cut XR packet delay by up to 33\% in a nine-cell dense
+urban case \cite{W4406264804}.
+
+\subsection{Coexistence and energy}
+XR rarely has a cell to itself. Adding a 45~Mbps XR flow with a 10~ms packet delay budget (PDB) cost about
+45~Mbps of broadband capacity \cite{W4385801627}, but interference from broadband users in other cells
+removed about 80\% of XR capacity; restricting broadband throughput by about half restored it at a 20~ms
+PDB \cite{W4387546593}. Power saving competes with delay: standardised and proposed sleep schemes saved
+6--23\% of device energy without delaying traffic unacceptably \cite{W4406265335}.
+
+\subsection{Telling the application what the network can carry}
+A second family closes the loop from network to application (\cref{fig:loop}). NetXRate combines
+core-network analytics with an O-RAN xApp to recommend rates, and cut outage by up to 96\% against
+over-the-top adaptation in simulation \cite{W7161282618}. On a 4G O-RAN testbed, an xApp held VR latency
+near its target and freed 15.8\% of resources for other users \cite{W4392175446}.
+
+\subsection{Wi-Fi~7 and millimetre wave}
+\emph{Multi-link operation} (MLO) in Wi-Fi~7 lets one device use several channels. In simulation, it
+supported seven AR stations where a single link supported six, while policies that need simultaneous
+access to all links suffered under contention \cite{W4376480829}; for the same total bandwidth, more and
+narrower links gave lower delay than fewer wide ones \cite{W4412836976}. \emph{Millimetre wave} offers the
+rates that uncompressed Quest~3 video would need (15.75--26.25~Gbps), yet tested hardware delivered
+1.85--1.98~Gbps, and moderate head rotation at 45 degrees per second drove loss to 4.72\% in one
+configuration \cite{W4401507876}. Dual-beam reception across coordinated access points improved reliability by up to 22.8\% on real head-motion traces \cite{W4409076649}.
+
+These results share their assumptions: system-level simulation with 3GPP-style traffic, which
+\cref{sec:measure} found too light, and a user counted as satisfied when enough packets meet the PDB. No
+study has yet shown that frame-aware scheduling raises the QoE that \cref{sec:qoe} measured.

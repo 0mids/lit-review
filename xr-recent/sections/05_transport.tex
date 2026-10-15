@@ -1,0 +1,51 @@
+\section{Transport and Delivery}\label{sec:transport}
+
+Above the radio the question is the same: deliver each frame before its deadline, and send less when the
+path cannot.
+
+\subsection{Earlier congestion signals}
+Delay- and loss-based controllers react after a queue has formed, which is a frame too late for XR.
+\emph{L4S} marks congestion before queues grow. In volumetric video conferencing, an L4S pipeline
+converged on the available rate 45\% faster than Google Congestion Control (GCC) and lost no packets,
+while the WebRTC baseline left 3\% of frames undecodable \cite{W4408870658}. \emph{Comparisons of
+existing controllers} remain mixed: integrated into ALVR, GCC tracked the available rate closely with few
+dropped frames, but only NADA held a fair share against loss-based flows \cite{W4415538381}.
+\emph{In-network adaptation} moves the decision to the base station. Octopus lets senders overestimate
+capacity and drops application-chosen packets at the cell, reporting 1.5--18$\times$ better performance
+for standard and volumetric video \cite{W4401386494}.
+
+\subsection{Transports with deadlines}
+QUIC removes transport head-of-line blocking and offers unreliable datagrams. \emph{Media over QUIC} (MoQ)
+adds delivery timeouts, which a point-cloud server used for implicit adaptation: clients with tight
+latency targets received lower quality, relaxed ones higher quality \cite{W4417496773}. WebRTC keeps its
+strengths for groups: through a selective forwarding unit, volumetric video adapted to user movement 13\%
+and 36\% faster than over TCP at 5 and 10~ms of network latency \cite{W7151958829}. Which transport suits
+interactive XR is still \emph{contested}.
+
+\Cref{sec:qoe} showed that loss, not delay, drives QoE, yet a retransmission costs a frame time.
+\emph{Selective protection} spends redundancy where it matters. ReVo applies forward error correction (FEC)
+to critical colour and depth content and repairs the rest with a neural module, cutting freezes by up to
+95.7\% on real loss traces \cite{W7159678172}. A hybrid broadcast--unicast design masked typical wireless
+loss with 15\% FEC overhead while keeping volumetric latency under 40~ms \cite{W4415933998}.
+
+\subsection{Adapting what is rendered and sent}
+\emph{Application-layer rate adaptation} is the oldest loop and still effective: over Wi-Fi, a
+network-aware bitrate algorithm for ALVR adapted to contention and mobility \cite{W4405014964}.
+\emph{Perception-driven sending} lets the user decide what to send, and it is the one family validated
+with users. Dynamic foveation driven by streamed gaze added 0.60 MOS over static foveation while saving
+9.81\% bitrate in cloud VR gaming \cite{W4377981508}, and EyeNexus adapted the foveal region to bandwidth
+and cut latency by up to 70.9\% \cite{W4416659623}. Encoding settings driven by a learned QoE model raised
+interaction quality by 1.20 MOS \cite{W4400981668}. \emph{Split decisions} move work between device and
+edge: RenderFusion switches objects between local and remote rendering using a perceptual study of
+latency \cite{W4389296467}.
+
+\subsection{Volumetric and Gaussian-splat delivery}
+Volumetric content turns the trade-off between bandwidth and latency into one between compression and
+latency. In VR2Gather, compression cut bandwidth by more than 90\% but raised latency to 278.7~ms, and
+DASH delivery reached 562~ms against 87.4~ms over TCP \cite{W4362496249}. MuV2 served over 30 untethered devices from
+one access point by mixing direct volumetric streaming with remote rendering \cite{W4399121637}. Gaussian
+splats bring compact, progressive formats: V\textsuperscript{3} streams about 0.5~MB per frame and renders
+at 27~fps on a phone \cite{W4404525293}, Vega reaches 30~fps on smartphones by prioritising important
+objects \cite{W4416477288}, and TIGAS renders splats remotely and streams 2D views over QUIC
+\cite{W7160906632}. These systems report PSNR, SSIM and frame rate; none of them reports a networked user
+study.

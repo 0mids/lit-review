@@ -1,0 +1,32 @@
+\section{Open Problems and Conclusion}\label{sec:outlook}
+
+The loop in \cref{fig:loop} is now closed at every layer, but each layer closes it against its own
+metric: the radio against delay budgets, transport against frame loss, the renderer against image
+quality. Five questions would join the parts.
+
+\begin{openproblems}
+\item \textbf{Do QoE thresholds survive real network dynamics?} Every user study in \cref{sec:qoe} applied
+  static delay, independent loss or fixed jitter, while measured wireless loss arrives in bursts
+  \cite{W7202080971}. Replaying recorded Wi-Fi and 5G traces to participants would show whether the
+  tolerance of 75--77~ms RTT and the dominance of loss still hold.
+\item \textbf{Does frame-aware scheduling raise QoE?} Frame-aware schedulers report 15--45\% more capacity
+  \cite{W4402156740,W4406264804}, counted as packets that meet a PDB under traffic models that
+  underestimate real demand \cite{W4399340506}. A testbed that couples such a scheduler to a headset and a
+  QoE model would test whether capacity gains are experience gains.
+\item \textbf{Who should own the rate?} Network recommendations \cite{W7161282618}, Release-19 uplink rate
+  control \cite{W7164211432}, L4S marks \cite{W4408870658} and application bitrate adaptation
+  \cite{W4405014964} can all act on one flow. Their joint stability, fairness and response time are
+  unstudied.
+\item \textbf{What is group QoE?} Social studies test pairs \cite{W4392600587,W4415821547}, while
+  platforms serve five or more users through forwarding servers \cite{W4403981191}. How delay assigned to
+  one member changes the experience of the others, and how to share impairments fairly, is unknown.
+\item \textbf{Which representation for which link?} Point clouds, keypoint avatars, Gaussian splats and
+  remotely rendered video trade bandwidth, device computation and latency differently, but each is
+  evaluated alone and on image metrics \cite{W4404525293,W4416477288,W7160906632}. A common user-facing
+  benchmark over the same network traces is missing.
+\end{openproblems}
+
+Since 2023, networked XR has gained frame-aware radios, earlier congestion signals, transports with
+deadlines and content built for adaptation, while users have shown that reliability matters more than the
+last tens of milliseconds. The next step is to judge each mechanism by the experience it produces under
+real network dynamics, alone and in groups.
