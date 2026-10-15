@@ -37,7 +37,7 @@ An immersive client displays only a fraction of what it could receive, and it mu
   \draw[decorate, decoration={brace, amplitude=4pt, mirror}, draw=black!60, line width=0.5pt]
     ([yshift=-5pt]s0.south west) -- ([yshift=-5pt]s4.south east)
     node[midway, below=5pt, note, text=black] (hz) {buffer length $B$ = prediction horizon};
-  \node[note, below=0pt of hz] (hzn)
+  \node[note, anchor=north] (hzn) at (hz.south -| buf.south)
     {deep $B$ absorbs throughput dips but needs\\far predictions (viewport accuracy 90\% at\\0.2~s, 35\% at 3~s); shallow $B$ stalls on dips};
   \begin{scope}[on background layer]
     \node[tier, fit=(trk)(abr)(dec)(buf)(hzn)(tp)(tf)] (cl) {};
@@ -69,7 +69,7 @@ An immersive client displays only a fraction of what it could receive, and it mu
   \draw[req] (abr.east) -- node[note, below] {tile\\requests} (pf.west |- abr.east);
   \draw[req] (pf.east) -- node[note, above] {prefetch} (pf.east -| org.west);
   \draw[req] ([yshift=5pt]cache.east) -- node[note, above] {miss} ([yshift=5pt]cache.east -| org.west);
-  \draw[data] ([yshift=-6pt]cache.east -| org.west) -- node[note, below] {segments} ([yshift=-6pt]cache.east);
+  \draw[data] ([yshift=-6pt]cache.east -| org.west) -- node[note, below, pos=0.4] {segments} ([yshift=-6pt]cache.east);
   \draw[data] (cache.west) -- node[note, above] {tiles (hit)} (buf.east);
   % legend
   \draw[data] (13.05,-1.4) -- ++(0.6,0) node[note, right=1pt] {content};
