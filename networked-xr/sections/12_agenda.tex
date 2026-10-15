@@ -1,10 +1,8 @@
 \section{Research Agenda}\label{sec:agenda}
 
-The open problems of Sections~\ref{sec:encode}--\ref{sec:assure} merge into \nxrSynProjects{} projects
-that a university networking or multimedia laboratory could start now. Together they would close
-\nxrSynProjGapsClosed{} of the \nxrSynGapsTotal{} verified gaps, \nxrSynProjHighClosed{} of them with high
-confidence. We order them by dependency, following \cref{fig:themes}: projects that produce shared
-artefacts come first, because the others consume them (\cref{fig:roadmap}).
+The gaps of \cref{sec:synthesis} suggest fourteen projects that a networking or multimedia laboratory
+could start with existing hardware and open software. We order them by dependency (\cref{fig:roadmap}).
+Projects that produce shared artefacts come first, because the others need them.
 
 \begin{figure}[t]
 \centering
@@ -24,7 +22,7 @@ artefacts come first, because the others consume them (\cref{fig:roadmap}).
   \foreach \n/\y/\t in {a3/-0.45/{\textbf{A3} Closed-loop benchmark for viewport and pose predictors},
                         a5/-1.32/{\textbf{A5} L4S, delay-based control and FEC on real bottlenecks},
                         a6/-2.19/{\textbf{A6} Privacy--QoE frontier of traffic defences},
-                        a7/-3.06/{\textbf{A7} Haptic tolerance curves and an open haptic corpus},
+                        a7/-3.06/{\textbf{A7} Haptic tolerance curves and an open haptic trace set},
                         a8/-3.93/{\textbf{A8} Interest-managed avatar replication beyond 100 clients},
                         a9/-4.8/{\textbf{A9} Percentile latency budgets for 6DoF split rendering}}
     {\node[pj] (\n) at (8.1,\y) {\t};}
@@ -52,8 +50,8 @@ validated QoE model that the Phase-3 projects optimise against (red arrows). A4 
 offloading, avatar and shared-state traffic, tiled 360-degree video and twin-state updates. Each trace
 would record pose, encoder output, packets at both ends, application events and photodiode MTP on a
 common clock. The project would then fit traffic models, compare them with the 3GPP XR models, and release
-the traces with a replay harness for ns-3 and NetEm. It closes \nxrSynPTracesGaps{} gaps and ranks first
-because \nxrSynPTracesUnlocks{} projects consume it. The \emph{rated replay dataset} (A2) would have
+the traces with a replay harness for ns-3 and NetEm. It comes first because every
+later project consumes it. The \emph{rated replay dataset} (A2) would have
 participants perform interactive tasks while the network replays A1's traces. It would collect momentary
 and session ratings, sickness scores, task performance and packet logs together, so that a QoE model can
 be fitted and then used as the objective by other work. It would also measure the difference between
@@ -71,7 +69,7 @@ controllers as xApps on an open RAN (A12), group QoE and fairness (A13), and a m
 of semantic, Gaussian-splat and geometric telepresence (A14).
 
 \paragraph{The evaluation bar.} Each project should meet the standard that Transactions-level reviewers
-apply and that most of the corpus does not meet. First, a \emph{baseline ladder}: a trivial baseline,
+apply, and that much current work does not yet meet. First, a \emph{baseline ladder}: a trivial baseline,
 a classical method, the strongest recent method re-implemented under the same conditions, an ablation
 and, where computable, an oracle. Second, \emph{realism with control}: real hardware for the claim and
 trace replay for repeatability, with the gap between simulation and measurement reported. Third,

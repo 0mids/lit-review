@@ -1,85 +1,82 @@
 \section{Cross-Cutting Gaps}\label{sec:synthesis}
 
-Read side by side, the open problems of the six functions repeat themselves in different vocabularies. Take
-a viewport predictor never tested in a closed loop, an offloading controller that never left the
-simulator, and an allocation scheme whose QoE objective was never shown to a user. They are three
-instances of one shortfall. The atlas verified \nxrSynGapsTotal{} gaps across its \nxrDeepCells{} cells,
-\nxrSynGapsHigh{} of them with high confidence. Nine themes account for \nxrSynCovered{} of them
-(\nxrSynCoveredShare{}), including \nxrSynCoveredHigh{} of the high-confidence ones
-(\cref{tab:themes}). A theme was kept only if it held gaps from at least six cells. We group the nine
-themes into three families.
+Read side by side, the open problems of the six functions repeat themselves in different vocabularies.
+A viewport predictor never tested in a closed loop, an offloading controller that never left the
+simulator and an allocation scheme whose QoE objective was never shown to a user are three instances of
+one shortfall. We condense the open problems of \cref{sec:encode,sec:anticipate,sec:compute,sec:provision,sec:connect,sec:assure}
+into nine themes (\cref{tab:themes}) in three families: the \emph{evidence} that claims rest on, the
+\emph{objectives} that designs optimise, and the \emph{blind spots} that most designs leave out.
 
 \begin{table}[t]
 \centering\small
-\caption{Nine cross-cutting themes. Gaps: verified cell gaps that instance the theme (high-confidence in
-brackets). Cells: atlas cells in which the theme recurs. A gap can belong to more than one
-theme.}\label{tab:themes}
+\caption{Nine cross-cutting gaps in networked XR, grouped into three families. Each recurs in at least
+three of the six functions.}\label{tab:themes}
 \setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{4.6cm}rr>{\raggedright\arraybackslash}X@{}}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{3.0cm}@{}}
 \toprule
-& Theme & Gaps & Cells & Indicative evidence\\
+& Gap & What goes wrong & Functions affected\\
 \midrule
-\multicolumn{5}{@{}l}{\emph{Evidence foundations}}\\
-T1 & No open traces, datasets or benchmarks & \nxrSynDataGapGaps{} (\nxrSynDataGapHigh{}) & \nxrSynDataGapCells{} & \nxrNDatasets{} dataset papers; \nxrSynReleaseShare{} of abstracts mention released code or data\\
-T2 & Evaluation stops at the simulator & \nxrSynSimOnlyGaps{} (\nxrSynSimOnlyHigh{}) & \nxrSynSimOnlyCells{} & \nxrSynLearnedReal{} of \nxrSynLearnedN{} learning papers tested on a real network\\
-T3 & Standards are not the evaluation substrate & \nxrSynStandardsGaps{} (\nxrSynStandardsHigh{}) & \nxrSynStandardsCells{} & \nxrSynThreeGPPXRN{} XR abstracts name 3GPP; none evaluated with users\\
+\multicolumn{4}{@{}l}{\emph{Evidence}}\\
+T1 & No open traces or benchmarks & Each design is tested on its own stack and workload; results cannot be compared or reproduced & all six\\
+T2 & Evaluation stops at the simulator & Learned and optimised controllers meet synthetic channels, traffic and motion, rarely a real link & anticipate, compute, provision\\
+T3 & Standards unused as baselines & Standard traffic models, codecs and QoE models are seldom the reference configuration, and seldom checked & encode, provision, assure\\
 \addlinespace
-\multicolumn{5}{@{}l}{\emph{Objectives}}\\
-T4 & Network metrics not linked to experience & \nxrSynNoQoEGaps{} (\nxrSynNoQoEHigh{}) & \nxrSynNoQoECells{} & \nxrSynQoEtermN{} abstracts invoke QoE; \nxrSynQoEtermUsers{} test it with users\\
-T5 & Requirement figures inherited, not derived & \nxrSynRequirementsGaps{} (\nxrSynRequirementsHigh{}) & \nxrSynRequirementsCells{} & 1~ms target in \nxrSynOneMsN{} abstracts, \nxrSynOneMsUsersN{} tested with users\\
+\multicolumn{4}{@{}l}{\emph{Objectives}}\\
+T4 & Metrics not linked to experience & ``QoE'' objectives use chosen weights; user studies apply static impairments, not real dynamics & all six\\
+T5 & Requirements inherited, not derived & Rate and latency targets are copied between surveys without naming content, codec, loop or percentile & encode, provision, connect\\
 \addlinespace
-\multicolumn{5}{@{}l}{\emph{Blind spots}}\\
-T6 & Uplink and sending side neglected & \nxrSynUplinkGaps{} (\nxrSynUplinkHigh{}) & \nxrSynUplinkCells{} & ``uplink'' in \nxrSynUplinktermShare{} of abstracts, \nxrSynUplinktermSimAna{} of them simulated\\
-T7 & Multi-user scale untested & \nxrSynScaleGaps{} (\nxrSynScaleHigh{}) & \nxrSynScaleCells{} & largest shared-world test: 225 clients \cite{W4400277138}\\
-T8 & Security and privacy not costed & \nxrSynSecurityGaps{} (\nxrSynSecurityHigh{}) & \nxrSynSecurityCells{} & \nxrSynSecLatUsersN{} of \nxrSynSecLatN{} security--latency papers tested with users\\
-T9 & Transport under real impairments & \nxrSynTransportGaps{} (\nxrSynTransportHigh{}) & \nxrSynTransportCells{} & \nxrSynXLFourSN{} corpus papers apply L4S\\
+\multicolumn{4}{@{}l}{\emph{Blind spots}}\\
+T6 & The uplink & Pose, camera and capture streams are modelled as small or ignored; measured uplinks are the bottleneck & compute, provision, connect\\
+T7 & Multi-user scale & Systems and studies use one to a few users; group effects and fairness are untested & anticipate, connect, assure\\
+T8 & Uncosted security & Attacks are measured; defences are not priced in frame latency or QoE & anticipate, connect, assure\\
+T9 & Transport under real impairments & Interactive frames inherit assumptions from buffered streaming; loss resilience is rare & compute, provision, connect\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Evidence foundations}
-The first family concerns what claims are tested against. \emph{Data are missing} (T1). There are no
-public traffic traces for AR offloading, avatar streams, twin-state updates, holographic calls or haptic
-flows. No 360-degree dataset records head motion, network conditions and ratings in the same session,
-and no latency benchmark couples motion, network delay and photodiode-measured MTP. Even simple
-baselines are often missing: a persistence predictor reached a hit rate of 0.8355 against 0.8402 for a
-sequence-to-sequence model on the same data \cite{W2963428739}. \emph{Evaluation stops at the simulator}
-(T2). Whole technology lines, including reconfigurable surfaces carrying XR, terahertz XR links and
-metaverse resource markets, have never met hardware. Where learned controllers were tested on unseen
-users or content, they degraded \cite{W4403826584,W4400409717}. \emph{Standards are not used as the
-substrate} (T3). 3GPP XR traffic models appear almost only in radio simulations. When one was checked
-against measurement, it underestimated cloud-VR bitrate by 25\% \cite{W4399340506}. OMAF, MPEG Immersive
-Video, IEEE~1918.1.1 and ITU-T P.1203/P.1204 are rarely the baseline configuration. The three gaps share
-a cause. Collecting traces and building testbeds is costly, and venues that publish algorithms rarely
-credit either.
+\subsection{Evidence}
+The first family concerns what claims are tested against. \emph{Shared data are missing} (T1). There are
+no public traffic traces for AR offloading, avatar streams, twin-state updates, holographic calls or
+haptic flows. No 360-degree dataset records head motion, network conditions and ratings in the same
+session, and no latency benchmark couples motion, network delay and photodiode-measured MTP. Even simple
+baselines are often absent. A persistence predictor reached a hit rate of 0.8355 against 0.8402 for a
+sequence-to-sequence model on the same data \cite{W2963428739}. \emph{Evaluation stops at the
+simulator} (T2). Whole technology lines, among them reconfigurable surfaces carrying XR, terahertz XR
+links and metaverse resource markets, have never met hardware. Where learned controllers were tested on
+unseen users or content, they degraded \cite{W4403826584,W4400409717}. \emph{Standards are not the
+substrate} (T3). Standard XR traffic models appear almost only in radio simulations. When one was
+checked against measurement, it underestimated cloud-VR bitrate by 25\% \cite{W4399340506}. The three
+gaps share a cause. Traces and testbeds are costly to build, and the venues that publish algorithms
+rarely credit them.
 
 \subsection{Objectives}
 The second family concerns what is optimised. \emph{Network metrics are not linked to experience} (T4).
-This is the largest theme. Most papers that optimise ``QoE'' optimise a formula whose weights were
-chosen rather than fitted. Where users were asked, the answers diverged from the proxies. Packet loss
-outweighed delay in VR cloud gaming \cite{W4404916373}. Users of collaborative VR could not tell forms
-of latency apart \cite{W4392600587}. CloudVR users did not notice 20~ms of added latency
-\cite{W2896076858}, while offloading papers optimise to budgets of 5--13~ms. \emph{Requirements are
-inherited} (T5). Vision papers state 100--250~Mbps per metaverse user \cite{W4313291084,W4312940001},
-while a measured commercial social-VR platform used 2--3~Mbps downstream \cite{W4294643390}. Holographic
-requirements range from 5--100~Mbps for compressed calls \cite{W4312662428} to 6.63~TBps
-\cite{W4300960574}. Haptic users tolerated up to 200~ms with adaptive control \cite{W4200154132}, against
-the 1~ms figure that motivates much tactile-internet work. A requirement that names neither the
-representation, the codec, the loop nor the percentile cannot be checked.
+Most objectives called ``QoE'' are formulas whose weights were chosen rather than fitted. Where users
+were asked, their answers diverged from the proxies. Packet loss outweighed delay in VR cloud gaming
+\cite{W4404916373}. Users of collaborative VR could not tell forms of latency apart \cite{W4392600587}.
+CloudVR users did not notice 20~ms of added latency \cite{W2896076858}, while offloading designs optimise
+to budgets of 5--13~ms. \emph{Requirements are inherited} (T5). Visions state 100--250~Mbps per metaverse
+user \cite{W4313291084,W4312940001}, while a measured commercial social-VR platform used 2--3~Mbps
+downstream \cite{W4294643390}. Holographic figures range from 5--100~Mbps for compressed calls
+\cite{W4312662428} to 6.63~TBps \cite{W4300960574}. Haptic users tolerated up to 200~ms with adaptive
+control \cite{W4200154132}, against the 1~ms figure that motivates much tactile-internet work. A
+requirement that names neither the representation, the codec, the loop nor the percentile cannot be
+checked.
 
 \subsection{Blind spots}
 The third family concerns what is left out. XR sends a continuous upstream, yet the \emph{uplink} (T6)
-is studied far less than the downlink, and the measured cases are pessimistic. On public LTE, multi-user
-AR had a median end-to-end latency of 12.5~s, with the radio access network contributing 31.2\%
-\cite{W3047439371}. With three headsets on Wi-Fi~6, uplink OFDMA delayed tracking data
+is studied far less than the downlink, and where it has been measured it is the bottleneck. On public
+LTE, multi-user AR had a median end-to-end latency of 12.5~s, with the radio access network contributing
+31.2\% \cite{W3047439371}. With three headsets on Wi-Fi~6, uplink OFDMA delayed tracking data
 \cite{W4396853623}. \emph{Scale} (T7) is untested. Measured social platforms scale linearly because they
 forward all avatar data \cite{W4307020344}, and controlled QoE studies use pairs of users. \emph{Security
 is not costed} (T8). Attacks are measured and effective: keystrokes were inferred from avatar motion with
-97.62\% accuracy \cite{W4398796475}. Defences, however, are seldom priced in frame latency. \emph{Transport}
-(T9) has not followed the move from buffered streaming to interactive delivery. Users rank loss above
-delay \cite{W3095344018,W4404916373}, yet forward error correction and L4S are rare. An L4S pipeline for
-volumetric conferencing converged 45\% faster than Google Congestion Control \cite{W4408870658}, but in a
-controlled bottleneck.
+97.62\% accuracy \cite{W4398796475}. Defences, however, are seldom priced in frame latency.
+\emph{Transport} (T9) has not followed the move from buffered streaming to interactive delivery. Users
+rank loss above delay \cite{W3095344018,W4404916373}, yet forward error correction and L4S are rarely
+applied. An L4S pipeline for volumetric conferencing converged 45\% faster than Google Congestion Control
+\cite{W4408870658}, but only in a controlled bottleneck.
 
 \begin{figure}[t]
 \centering
@@ -111,14 +108,14 @@ cannot be derived, and allocation, transport and security results cannot be comp
 to users.}\label{fig:themes}
 \end{figure}
 
-\subsection{How the themes depend on each other}
-The themes are not independent (\cref{fig:themes}). Two are roots. Without open traces (T1),
-simulations cannot be validated (T2), requirements cannot be derived (T5), standard traffic models cannot
-be checked (T3), and uplink and multi-user workloads cannot even be described (T6, T7). Without a
-validated mapping from network metrics to experience (T4), results on allocation, transport and security
-(T8, T9) cannot be compared in units that matter to users. The two smaller clusters outside the themes
-point the same way. Device-energy savings from offloading rest on models, and the few measurements
-disagree: one standalone headset drained its battery 15\% faster when offloading wirelessly
-\cite{W4362489903}, while an edge VR testbed found lower client power \cite{W4296339041}. Neural
-scene representations have no tested rate adaptation, cache or split point. Both clusters need the same
-two roots. This ordering shapes the agenda that follows.
+\subsection{How the gaps depend on each other}
+The gaps are not independent (\cref{fig:themes}). Two are roots. Without open traces (T1), simulations
+cannot be validated (T2), requirements cannot be derived (T5), standard traffic models cannot be checked
+(T3), and uplink and multi-user workloads cannot even be described (T6, T7). Without a validated mapping
+from network metrics to experience (T4), results on allocation, transport and security (T8, T9) cannot
+be compared in units that matter to users. Two smaller questions point the same way. Device-energy
+savings from offloading rest on models, and the few measurements disagree: one standalone headset
+drained its battery 15\% faster when offloading wirelessly \cite{W4362489903}, while an edge VR testbed
+found lower client power \cite{W4296339041}. Neural scene representations have no tested rate
+adaptation, cache or split point. Both questions need the same two roots, and this ordering shapes the
+agenda that follows.

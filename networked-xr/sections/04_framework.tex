@@ -1,13 +1,13 @@
 \section{A Functional Framework for Networked XR}\label{sec:framework}
 
-The atlas labels every paper by the networking problem it addresses and by the content it carries. These
-labels are precise, but \nxrNCatProb{} problems and \nxrNCatCont{} content types are too many to reason
-about together, and they mix levels: ``latency'' is a property, ``caching'' a mechanism and
-``holographic communication'' an application. We therefore group them by \emph{function}, the job a
-part of the system performs in the loop between the user's body and the content they perceive. A function
-is defined by a design question that any networked XR system must answer, whatever its medium or access
-network. \Cref{fig:architecture} places the six functions on a reference architecture, and
-\cref{tab:framework} lists the atlas categories that each function contains.
+Networked XR is usually described by its parts: latency, caching, 5G, point clouds, holographic
+communication. These labels mix levels. Latency is a property, caching a mechanism, 5G a technology and
+holographic communication an application. Lists of such topics therefore do not show how the parts
+depend on each other. We instead describe the field by \emph{function}, the job a part of the system
+performs in the loop between the user's body and what the user perceives. Each function answers one
+design question that any networked XR system must answer, whatever its medium or access network.
+\Cref{fig:architecture} places the six functions on a reference architecture, and \cref{tab:framework}
+summarises the families of approaches that each function contains.
 
 \begin{figure}[t]
 \centering
@@ -104,49 +104,44 @@ computation is split between device and edge.}\label{fig:architecture}
         measurement and modelling, traffic characterisation, and security, privacy and trust.
 \end{description}
 
-Three properties make this grouping useful. First, it is \emph{exhaustive}: every networking problem in
-the atlas codebook except the residual ``other'' (\nxrNProbOther{} papers) belongs to exactly one
-function, and every specific content type has a natural home. Second, the functions are \emph{ordered
-along the loop}. Encoding and anticipation decide what is sent, computation and provisioning decide where
-and how, and connection and assurance concern the people at the ends. Third, each function has a
-\emph{characteristic evidence profile} (\cref{tab:framework}). The functions that build systems
-(compute, connect) are tested on real testbeds far more often than those that optimise models
-(provision, encode). The same gap therefore recurs in different words across the sections that follow,
-and Section~\ref{sec:synthesis} returns to it.
+\paragraph{Why functions.} The grouping has three useful properties. First, each function is
+\emph{one decision}. Encoding chooses a representation and anticipation a fetch schedule. Computing
+chooses a split point and provisioning an allocation. Connecting chooses a consistency model and assuring
+a definition of ``good enough''. Approaches that answer the same decision can be compared directly, even
+when they come from different communities. Second, the functions are \emph{ordered along the loop}.
+Encoding and anticipation decide what is sent, computing and provisioning decide where and how, and
+connecting and assuring concern the people at the ends. Third, the functions are \emph{coupled}, and the
+couplings are where most design difficulty lies.
+
+\paragraph{How the functions couple.} Two couplings run through the whole review. The first is the
+\emph{shared deadline}. A head-worn display tolerates about 15--20~ms from motion to photon, which
+leaves roughly 14~ms for computation and communication \cite{W2784711283}. Every function spends from
+this one budget. A longer prediction horizon in anticipation relaxes the network but costs accuracy. A
+remote split in computing adds a round trip that provisioning must keep short and that reprojection must
+partly hide. A heavier codec in encoding saves rate but adds encoding delay. The second coupling is the
+\emph{trade between network and device}. Almost every design moves cost from one to the other. A compact
+representation must be decoded or synthesised on the headset. Rendering at the edge saves the headset's
+GPU but spends its radio and battery, and prefetching saves delay but spends bandwidth on content that
+may never be seen. Reading the sections that follow with these two couplings in mind explains why
+results rarely transfer between settings. A gain obtained under one budget, or one division of cost, is
+not a gain under another.
 
 \begin{table}[t]
 \centering\small
-\caption{The six functions, the atlas categories they contain and their evidence profile. Papers: primary
-problem label. Share: percentage of all papers in 2017--19 and in 2022--24. Real: evaluated on a real
-network or testbed, with or without users. Sim.: simulation or analysis only.}\label{tab:framework}
+\caption{The six functions at a glance. Each row names the design question, the families of approaches
+compared in the corresponding section and the trade-off that all of them negotiate.}\label{tab:framework}
 \setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{3.0cm}rcrr@{}}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.55cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{3.7cm}@{}}
 \toprule
-Function & Networking problems (atlas cells) & Main content types & Papers & Share 17--19 $\to$ 22--24 & Real & Sim.\\
+Function & Design question & Families of approaches & Central trade-off\\
 \midrule
-\textcolor{encode!80!black}{\textbf{Encode}} & Compression and coding & Volumetric, holographic, haptic & \fnEncodeN{} & \fnEncodeEarly{} $\to$ \fnEncodeLate{} & \fnEncodeReal{} & \fnEncodeSimAna{}\\
-\textcolor{anticipate!80!black}{\textbf{Anticipate}} & Rate adaptation and streaming; viewport and motion prediction; caching and prefetching & 360-degree video, volumetric & \fnAnticipateN{} & \fnAnticipateEarly{} $\to$ \fnAnticipateLate{} & \fnAnticipateReal{} & \fnAnticipateSimAna{}\\
-\textcolor{compute!70!black}{\textbf{Compute}} & Offloading and remote rendering; latency & Rendered frames, AR overlays & \fnComputeN{} & \fnComputeEarly{} $\to$ \fnComputeLate{} & \fnComputeReal{} & \fnComputeSimAna{}\\
-\textcolor{provision!80!black}{\textbf{Provision}} & Resource allocation; wireless link design; architecture and vision & XR traffic in general & \fnProvisionN{} & \fnProvisionEarly{} $\to$ \fnProvisionLate{} & \fnProvisionReal{} & \fnProvisionSimAna{}\\
-\textcolor{connect!80!black}{\textbf{Connect}} & Multi-user synchronisation; tactile and haptic transport; holographic communication & Avatars, haptic, holographic, digital twins & \fnConnectN{} & \fnConnectEarly{} $\to$ \fnConnectLate{} & \fnConnectReal{} & \fnConnectSimAna{}\\
-\textcolor{assure!80!black}{\textbf{Assure}} & QoE measurement and modelling; security, privacy and trust & All & \fnAssureN{} & \fnAssureEarly{} $\to$ \fnAssureLate{} & \fnAssureReal{} & \fnAssureSimAna{}\\
+\textcolor{encode!80!black}{\textbf{Encode}} \cref{sec:encode} & What representation of the scene travels? & Image-based (projected and tiled video, multi-view plus depth); geometry-based (point clouds, meshes); learned (radiance fields, Gaussian splats, semantic codecs); signal-based (haptic, holographic) & Rate on the wire against encoding delay and decoding cost on the device\\
+\textcolor{anticipate!80!black}{\textbf{Anticipate}} \cref{sec:anticipate} & What will the user need next, and how does it arrive in time? & What to predict (motion, viewport, gaze, saliency); what to fetch (tile and quality selection, heuristic, optimised or learned); where to keep it (buffer, edge cache, multicast) & Prediction horizon against accuracy; bandwidth saved against content wasted\\
+\textcolor{compute!70!black}{\textbf{Compute}} \cref{sec:compute} & Where does each stage run, and how is the delay hidden? & Full remote rendering; split and hybrid rendering; perception offload for AR; latency hiding by prediction, reprojection and speculation & Device compute and energy against network delay inside the deadline\\
+\textcolor{provision!80!black}{\textbf{Provision}} \cref{sec:provision} & How does the network supply rate, delay and reliability? & Link (mmWave, THz, RIS, Wi-Fi); scheduler (optimisation, heuristics, learning, XR-aware mechanisms); transport (delay-based and L4S control, FEC); architecture (edge, slicing, 6G) & Per-frame guarantees against shared capacity and efficiency\\
+\textcolor{connect!80!black}{\textbf{Connect}} \cref{sec:connect} & How are people and machines kept consistent and responsive? & Shared state (authoritative, replicated, interest-managed); people (avatars to holoportation); touch (teleoperation control, haptic coding); places (digital twins, freshness) & Consistency and fidelity against responsiveness and scale\\
+\textcolor{assure!80!black}{\textbf{Assure}} \cref{sec:assure} & How do we know it is good enough, and safe? & Experience (user studies, standard, objective and learned QoE models, traffic characterisation); trust (attack surfaces, defences) & Proxy metrics against perceived quality; protection against added delay\\
 \bottomrule
 \end{tabularx}
 \end{table}
-
-\paragraph{How functions and content combine.} The two labelling dimensions are not independent, and
-their dependence shows where the field's attention has and has not gone. The
-strongest associations are definitional and confirm the labels. Rate adaptation is studied mostly for
-360-degree video (\nxrXObsRateAdaptationStreamingVideoThreeSixty{} papers against
-\nxrXExpRateAdaptationStreamingVideoThreeSixty{} expected under independence), tactile transport for
-haptic signals, and multi-user synchronisation for avatars. The informative cells are the weak ones.
-Resource allocation for volumetric content holds \nxrXObsResourceAllocationVolumetricPointcloud{} papers
-against \nxrXExpResourceAllocationVolumetricPointcloud{} expected, and offloading for avatars and social
-state \nxrXObsOffloadingRemoteRenderingAvatarsSocialState{} against
-\nxrXExpOffloadingRemoteRenderingAvatarsSocialState{}. QoE work rarely involves an edge deployment
-(\nxrXObsQoeMeasurementModellingEdgeFog{} against \nxrXExpQoeMeasurementModellingEdgeFog{}), and
-multi-user synchronisation over 5G is equally rare
-(\nxrXObsMultiuserSynchronisationFiveGCellular{} against \nxrXExpMultiuserSynchronisationFiveGCellular{}).
-The content types that the field now calls its future, volumetric and social, are the ones its
-allocation and offloading machinery has least often been applied to.
-

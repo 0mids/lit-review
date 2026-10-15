@@ -4,57 +4,51 @@ A head-mounted display shows a world that must respond to the head that wears it
 the new view must appear within a few tens of milliseconds, or the image lags the body and comfort
 fails \cite{W2784711283}. On a standalone device this deadline is met locally. Once the scene, the
 computation or the other participants are elsewhere, the network becomes part of the perceptual loop.
-Extended reality (XR), the umbrella term for virtual, augmented and mixed reality, therefore asks more of
-a network than video or the web. A 360-degree or volumetric stream needs hundreds of megabits per second
-if it is sent whole \cite{W3038754372,W3096564590}. Remote rendering must finish a frame within the
-motion-to-photon (MTP) budget \cite{W2784711283}. The device sends pose, camera frames and captured media
-upstream all the time. When several people share a world, the network must also keep them consistent
-with each other \cite{W2561715836}.
 
-Ten years of research have produced many answers to these demands, and they are scattered across
-communities that seldom read each other. Multimedia-systems researchers built viewport-adaptive
-streaming. Mobile-computing researchers offloaded AR recognition to the edge \cite{W3133913697}. Wireless
-researchers framed XR as a joint allocation of radio, computing and energy. Haptics researchers pursued
-the tactile internet \cite{W2811040154}. Visionaries placed all of it inside 6G and the metaverse
+Extended reality (XR), the umbrella term for virtual, augmented and mixed reality, therefore asks more of
+a network than video or the web, in four ways. The first is \emph{rate}. A 360-degree or volumetric
+scene sent whole needs hundreds of megabits per second, although the user sees only a fraction of it at
+any moment \cite{W3038754372,W3096564590}. The second is \emph{deadline}. Remote rendering must return a
+frame within the motion-to-photon (MTP) budget, so delay is not merely annoying but perceptually
+disqualifying \cite{W2784711283}. The third is \emph{direction}. The device sends pose, camera frames and
+captured media upstream all the time, so XR is not a download. The fourth is \emph{sharing}. When several
+people inhabit one world, or one person operates a remote machine, the network must keep endpoints
+consistent with each other, not just deliver media to each \cite{W2561715836}.
+
+Research on these demands is scattered across communities that seldom read each other. Multimedia-systems
+researchers built viewport-adaptive streaming \cite{W3038754372,W2971680322}. Mobile-computing
+researchers offloaded AR recognition to the edge \cite{W3133913697}. Wireless researchers framed XR as a
+joint allocation of radio, computing and energy. Haptics researchers pursued the tactile internet
+\cite{W2811040154}, and 6G and metaverse visions placed all of it inside a future network
 \cite{W4312940001,W4390204075}. Existing surveys follow these boundaries. Each covers one medium, such as
 360-degree video \cite{W3038754372,W2971680322,W2917103012}, point clouds \cite{W3096564590} or haptics
 \cite{W3088582486}, or one technology, such as edge computing \cite{W3133913697,W2902319104}, ultra-low
-latency \cite{W4362585626} or the 6G metaverse \cite{W4312940001,W4315497913}. None measures the field as
-a whole, and none asks how well its claims are tested.
+latency \cite{W4362585626} or the 6G metaverse \cite{W4312940001,W4315497913}. What is missing is a single
+frame that shows how these parts fit together, where they trade against each other, and how far each has
+been tested.
 
-This review does both. It condenses the \emph{Networked XR Atlas}, a corpus of \nxrIncluded{} papers
-published between October 2016 and October 2026. The atlas was screened from \nxrHarvested{} records
-with a validated procedure, labelled on five dimensions and read in depth where it mattered most
-(Section~\ref{sec:method}). The atlas supports three kinds of statement: counts and trends over the whole
-corpus, syntheses of the papers that shape each topic, and gaps that have been checked against a text
-search of every included paper.
+\paragraph{Organising idea.} We organise the field by \emph{function}: the six things any networked XR
+system must do, whatever its medium and access network (\cref{sec:framework}). A system must
+\emph{encode} the scene into something that can be sent (\cref{sec:encode}). It must \emph{anticipate}
+what the user will look at or do next, so that the right content arrives in time (\cref{sec:anticipate}).
+It must decide where to \emph{compute}, on the device, at the edge or in the cloud, and how to hide the
+delay this adds (\cref{sec:compute}). It must \emph{provision} the network with links, schedulers,
+transport and architecture that supply the rate, delay and reliability required (\cref{sec:provision}).
+It must \emph{connect} users with each other and with remote machines, through shared state, touch and
+telepresence (\cref{sec:connect}). And it must \emph{assure} that the result is good enough and safe for
+the people who use it (\cref{sec:assure}). Each function poses its own design question. Within each, we
+group approaches into a few families by their underlying idea, so that methods described in different
+vocabularies can be compared on the same terms.
 
-\paragraph{Organising idea.} We do not organise the field by technology or by medium. We organise it by
-\emph{function}: the six things any networked XR system must do, whatever its medium and access network
-(Section~\ref{sec:framework}). A system must \emph{encode} the scene into something that can be sent
-(Section~\ref{sec:encode}). It must \emph{anticipate} what the user will look at or do next, so that the
-right content arrives in time (Section~\ref{sec:anticipate}). It must decide where to \emph{compute}, on
-the device, at the edge or in the cloud, and how to hide the delay this adds (Section~\ref{sec:compute}).
-It must \emph{provision} the network with radio, scheduling, transport and architecture that supply the
-rate, delay and reliability required (Section~\ref{sec:provision}). It must \emph{connect} users with each
-other and with remote machines, through shared state, touch and telepresence (Section~\ref{sec:connect}).
-And it must \emph{assure} that the result is good enough and safe for the people who use it
-(Section~\ref{sec:assure}). Each function poses its own design question, and the answers can be compared
-on the same terms.
-
-\paragraph{Contributions.} The review makes four contributions.
+\paragraph{Contributions.}
 \begin{enumerate}[leftmargin=*,label=(\arabic*)]
-  \item A \textbf{functional taxonomy} of networked XR that places the \nxrNCatProb{} networking problems
-        and \nxrNCatCont{} content types of the atlas codebook into six functions, each defined by a design
-        question (Section~\ref{sec:framework}, \cref{fig:architecture,tab:framework}).
-  \item A \textbf{quantitative account of how the field has changed}: its growth, the move from
-        delivering content to allocating resources, the replacement of 360-degree video by generic XR
-        traffic as the reference workload, and the decline of evaluation on real systems
-        (Section~\ref{sec:landscape}).
-  \item A \textbf{synthesis of each function} that separates what is established, what is contested and
-        what is assumed, with the measured results that support each claim
-        (Sections~\ref{sec:encode}--\ref{sec:assure}).
-  \item \textbf{Nine cross-cutting gaps} and a research agenda ordered by dependency: which projects
-        produce the data and models that the others need (Sections~\ref{sec:synthesis}
-        and~\ref{sec:agenda}).
+  \item A \textbf{functional framework} that places the problems of networked XR on one reference
+        architecture and defines each function by a design question (\cref{sec:framework}).
+  \item For each function, a \textbf{classification of approaches into families}, stating what each
+        family assumes, when it wins and where its limits lie, with the measured results that support each
+        claim (\cref{sec:encode,sec:anticipate,sec:compute,sec:provision,sec:connect,sec:assure}).
+  \item An account of the \textbf{couplings between functions}: the shared deadline and the trades
+        between network and device that tie them together.
+  \item \textbf{Nine cross-cutting gaps} and a research agenda ordered by dependency
+        (\cref{sec:synthesis,sec:agenda}).
 \end{enumerate}

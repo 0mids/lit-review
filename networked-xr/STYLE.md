@@ -73,3 +73,25 @@ sec:synthesis, sec:agenda, sec:conclusion.
 - At most one compact table in addition to the diagram, and only if it carries numbers the prose
   does not.
 - Figures use `[t]` placement, caption first sentence = what it shows, second = the point.
+
+## Revision 3 (supersedes earlier guidance where they conflict)
+The user's direction: the review must be about **networked XR itself** — its ideas, mechanisms,
+trade-offs and evidence — not about the literature as a dataset. The search/harvest method and the
+bibliometric trends are removed (they will be written later, elsewhere).
+- Remove all corpus statistics: no paper counts, shares, growth rates, "X% of papers", "the cell",
+  "the corpus", "the atlas", evaluation-profile percentages, or `\nxr...`/`\fn...` macros. Do not say
+  "N papers do X". Where scarcity of evidence matters, say it qualitatively and specifically ("no study
+  has replayed measured network dynamics to users", "only one deployment measured the uplink").
+- Keep and foreground the technical substance: design questions, mechanisms, architectures,
+  measured results with their conditions, trade-offs, what is established/contested/assumed.
+- **Grouping is the core value.** Inside each section, organise subsections by idea or design decision
+  (e.g. "what to predict", "where to split", "how to share state"), not by paper or by technology
+  label. Each subsection should open with the principle or tension it is about, then group the
+  approaches into a small number of families, saying what each family assumes and when it wins.
+  Name the families explicitly (a short italic lead-in or a compact comparison table is welcome).
+- Make links across functions explicit with \cref (e.g. prediction horizon in sec:anticipate sets
+  the latency budget in sec:compute).
+- Prose budget per function section: 1,300–1,600 words. One architecture/mechanism diagram (keep the
+  existing one, adjust if needed). Optionally one compact table that classifies approaches
+  (family | idea | assumes | strength | limit), not a table of counts.
+- Open-problems box stays (4–6 items), phrased as research questions about networked XR, without counts.

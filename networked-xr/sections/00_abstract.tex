@@ -1,25 +1,25 @@
 \begin{abstract}
-\noindent Extended reality (XR) asks more of a network than any earlier medium. It needs hundreds of
-megabits per second for 360-degree and volumetric content, a motion-to-photon deadline of a few tens of
-milliseconds, a continuous uplink of pose and sensor data, and a world that several people share. This
-review maps the research on meeting these demands. It draws on the Networked XR Atlas: \nxrIncluded{}
-papers published between October 2016 and October 2026, screened from \nxrHarvested{} OpenAlex records,
-labelled on five dimensions and read in depth where they mattered most.
+\noindent Extended reality (XR) asks more of a network than any earlier medium. A head-mounted display
+closes a perceptual loop between the user's body and the image: when the head turns, the new view must
+appear within a few tens of milliseconds. Once content, computation or other participants are elsewhere,
+the network sits inside that loop. It must carry 360-degree and volumetric media at hundreds of megabits
+per second, return rendered frames inside a motion-to-photon deadline, take a continuous uplink of pose
+and sensor data, and keep several people and machines consistent with each other.
 
-We organise the field by the six things a networked XR system must do: \emph{encode} the scene,
-\emph{anticipate} what the user will need, decide where to \emph{compute}, \emph{provision} the network,
-\emph{connect} people and machines, and \emph{assure} experience and trust. For each function we report
-what is established, what is contested and what is merely assumed.
+This review organises networked XR by the six things every such system must do. It must \emph{encode}
+the scene into something that can be sent, and \emph{anticipate} what the user will need next. It must
+decide where to \emph{compute}, and \emph{provision} the network that carries the result. It must
+\emph{connect} people and machines that share a world, and \emph{assure} that the experience is good
+enough and safe. For each function we set out the design question, group the approaches into families
+by their underlying idea, and separate what has been established on real systems from what is contested
+and what is merely assumed.
 
-Three findings stand out. First, the field has moved from delivering content to allocating resources.
-Work on anticipation (adaptive streaming, prediction, caching) fell from \fnAnticipateEarly{} to
-\fnAnticipateLate{} of output between 2017--19 and 2022--24, while work on provisioning the network rose
-from \fnProvisionEarly{} to \fnProvisionLate{}. Second, evidence has
-weakened as the field has grown. Evaluation on real networks or testbeds fell from \nxrEvalRealEarly{} to
-\nxrEvalRealLate{} of papers. Over the same period, simulation and analysis rose from \nxrEvalSimAnaEarly{}
-to \nxrEvalSimAnaLate{}, and only \nxrSynLearnedReal{} of learning-based papers were tested on real
-networks. Third, network metrics are seldom tied to what users perceive. Requirement figures are
-copied from survey to survey rather than measured, and the uplink, multi-user scale and the cost of
-security are rarely studied. We close with nine cross-cutting gaps and a research agenda ordered by what
-each project unlocks for the others.
+Read together, the functions expose a common structure. Each is a trade between network and device: a
+leaner representation costs decoding, a longer prediction horizon costs accuracy, and moving rendering
+off the headset costs delay that must be hidden. The functions are also coupled through a shared
+deadline, so a decision in one sets the budget of the next. Across all six, the same weaknesses recur.
+Objectives are rarely validated against what users perceive, and requirement figures are inherited
+rather than measured. Controllers are seldom tested beyond the simulator, and the uplink, multi-user
+scale and the latency cost of security are studied least. We close with a dependency-ordered research
+agenda.
 \end{abstract}
