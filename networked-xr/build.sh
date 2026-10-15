@@ -1,5 +1,5 @@
 #!/bin/sh
-# Rebuild figures' data macros, bibliography and PDF.
+# Rebuild bibliography and the ACM Computing Surveys PDF.
 set -e
 cd "$(dirname "$0")"
 python3 scripts/make_bib.py

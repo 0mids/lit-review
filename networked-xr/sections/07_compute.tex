@@ -1,17 +1,13 @@
 \section{Where Computation Happens: Offloading, Remote Rendering and Latency}\label{sec:compute}
 
 A headset has a few watts of power and a few milliseconds of slack. Offloading spends the second to
-save the first: it moves rendering or perception to an edge or cloud server and pays for that move in
-network delay, which must still fit inside the perceptual deadline of the display loop, the motion-to-photon (MTP)
-latency. The central design
-variable is therefore the \emph{split point}, the stage at which the sense--render--display pipeline
+save the first: it moves rendering or perception to an edge or cloud server and pays in network delay,
+which must still fit inside the deadline of the display loop, the motion-to-photon (MTP) latency. The
+central design variable is therefore the \emph{split point}, the stage at which the sense--render--display pipeline
 leaves the device. It fixes what crosses the network, which direction carries the load, how stale the
-result is when it returns, and which corrections the device can still apply before the photons leave the
-display (\cref{fig:compute-pipeline}). This section organises the field around four decisions: where to
-split, how to budget the delay a split adds, how to hide that delay, and what the split costs the device.
-What is sent is treated in \cref{sec:encode}, the prediction that hiding relies on in
-\cref{sec:anticipate}, the radio and transport that carry the split in \cref{sec:provision}, and how users
-perceive delay in \cref{sec:assure}.
+result is when it returns, and which corrections the device can still apply before display
+(\cref{fig:compute-pipeline}). This section follows four decisions: where to split, how to budget the
+delay a split adds, how to hide that delay, and what the split costs the device.
 
 \begin{figure}[t]
 \centering
@@ -130,140 +126,115 @@ Placement across tiers & Any of the above, to fog, edge or cloud & As hosted fam
 \end{table}
 
 
-\emph{Full remote rendering} moves the whole renderer and streams finished frames. The device keeps
-only decoding, reprojection and display. Compression is mandatory: raw stereo frames at
-2160$\times$1200 and 90~Hz need 5.6~Gbps, beyond any deployed radio \cite{W2838572662}. The design is
-simple and content-agnostic, but every frame is a video frame, so the codec sets a floor on delay and the
-downlink carries all of the load.
+\emph{Full remote rendering} moves the whole renderer and streams finished frames; the device keeps only
+decoding, reprojection and display. Compression is mandatory: raw stereo frames at 2160$\times$1200 and
+90~Hz need 5.6~Gbps \cite{W2838572662}. The design is simple and content-agnostic, but the codec sets a
+floor on delay.
 
-\emph{Split or hybrid rendering} divides the scene. Near or interactive objects are rendered on the
-device and the distant scene remotely; one such system used 20--30\% of the bandwidth of full remote
-rendering and tolerated delays of up to 200~ms \cite{W4399444696,W4389296467,W3080913128}. A related
-group sends an intermediate that the device can re-render from a new pose, not a finished image:
-colour plus depth for client-side warping \cite{W2751899584}, object-space shading atlases
-\cite{W2903169695}, one eye rendered remotely and the other reprojected, which lowered MTP by 36\%
-\cite{W4391557896}, or pixels reused across frames, which removed 95\% of frame data
-\cite{W2928088097}. Foveation belongs here too, with a caveat: foveated shading alone did not reduce
-bitrate, whereas foveated post-processing or encoding did \cite{W3186601312}. Neural scenes reopen the
-choice of intermediate. Current systems stream pixels \cite{W4415672032}, dynamic Gaussians
-\cite{W7106240991} or partial level-of-detail results \cite{W7117245976}, each against its own baseline,
-so the right split for them is not yet known (\cref{sec:encode}).
+\emph{Split or hybrid rendering} divides the scene. Near or interactive objects are rendered on the device
+and the distant scene remotely; one such system used 20--30\% of the bandwidth of full remote rendering
+and tolerated delays of up to 200~ms \cite{W4389296467}. Others send an intermediate that the device can
+re-render from a new pose: colour plus depth for client-side warping \cite{W2751899584}, or one
+eye rendered remotely and the other reprojected, which lowered MTP by 36\% \cite{W4391557896}. For neural scenes, streamed as pixels or as dynamic
+Gaussians \cite{W7106240991}, the right split is not yet known (\cref{sec:encode}).
 
 \emph{Perception offload} is the AR counterpart. The device streams camera frames upward, an edge GPU
-detects and recognises objects, and only labels and object poses return; tracking and overlay rendering
-stay local. The load now sits on the uplink. Once the server has a GPU, the network dominates inference
-latency, and sending frames as H.264 video rather than as images delivered about ten times more frames
-at 100~kbps \cite{W2792220137}.
+detects objects, and only labels and object poses return; tracking and overlay rendering stay local. The
+load now sits on the uplink. Once the server has a GPU, the network dominates inference latency, and
+sending frames as H.264 video rather than as images delivered about ten times more frames at 100~kbps
+\cite{W2792220137}.
 
-\emph{Placement} decides which server hosts the offloaded stages. Proximity is the one result that holds
-across methods. In a shipyard deployment, a fog gateway and a cloudlet answered in about 1~ms against
-49.3~ms for a remote cloud, but the fog gateway was four times slower than the cloudlet at 240 clients,
-and the Wi-Fi hop was excluded by design \cite{W2805833065}. A simulation found edge execution cut AR
-latency by 41.44\% against local and 12.85\% against cloud execution \cite{W2894645340}. Static placement
-breaks down once many users share an edge, because queueing at the server then dominates
-\cite{W4213053765,W4399320016}. Adaptive controllers answer with joint computation--communication
-optimisation, solved by deep reinforcement learning \cite{W3120265095} or Lyapunov control
-\cite{W4392567309}. Their weakness is the inputs they assume. A 2018 fit of detector accuracy against
-frame size \cite{W2790412025} reappears in later formulations \cite{W4386702674,W4388068949}, VR streams
-are modelled at a constant 25.32~Mbps \cite{W2596760110}, and schedulers for several rendering sessions
-on one GPU exist only in simulation \cite{W3214338661,W4285254743}. Learned placement is plausible but
-almost wholly untested on real render times and real links.
+\emph{Placement} decides which server hosts the offloaded stages, and proximity is the one result that
+holds across methods. In a shipyard deployment, a fog gateway and a cloudlet answered in about 1~ms
+against 49.3~ms for a remote cloud, but the fog gateway was four times slower than the cloudlet at 240
+clients, and the Wi-Fi hop was excluded by design \cite{W2805833065}. Static
+placement breaks down once many users share an edge, because server queueing then dominates
+\cite{W4213053765}. Adaptive controllers jointly optimise computation and communication, for example
+with deep reinforcement learning \cite{W3120265095}. Their weakness is their inputs: a 2018 fit of
+detector accuracy against frame size \cite{W2790412025} reappears in later formulations
+\cite{W4388068949}. Learned placement is plausible but almost wholly untested on real render times and
+real links.
 
 \subsection{How to budget delay}
 
 A latency budget is a sum of stage delays, and it means something only when it names the loop it bounds.
-\Cref{fig:compute-pipeline} shows the stages: sensing, uplink, render, encode, downlink, decode and display.
-The common decomposition allows under 1~ms for sensing and about 5~ms for the display within a
-15--20~ms MTP bound, which leaves about 14~ms for computing and communication \cite{W2784711283}. Stage
-measurements show how tight this is. A phone took 9--10~ms to encode and 14--16~ms to decode an H.264
-frame \cite{W2940859338}, so decoding alone can exceed the network's share.
+The common decomposition allows under 1~ms for sensing and about 5~ms for display within a 15--20~ms MTP
+bound, which leaves about 14~ms for computing and communication \cite{W2784711283}. This is tight: a phone took 9--10~ms to encode and 14--16~ms to decode an H.264 frame
+\cite{W2940859338}, so decoding alone can exceed the network's share.
 
 Pipelining and timing matter as much as link rate. Cutting the Cord split each eye's frame across four
 parallel encoders and aligned rendering with the client's display refresh. Over 802.11ad it reached
-10--14~ms end to end against a sequential median above 26~ms, and missed refreshes fell from
-5.3--14.3\% to 0.1--0.2\% \cite{W2838572662}. The uplink is easy to overlook in a frame-centred budget, and in AR it is
-the largest stage. In multi-user AR over LTE, median end-to-end latency was 12.5~s, the radio access
-network contributed 31.2\%, and uplink bursts triggered TCP slow starts \cite{W3047439371}; on 5G
+10--14~ms end to end against a sequential median above 26~ms \cite{W2838572662}. In AR the uplink is the largest stage. In multi-user AR over LTE, median end-to-end latency was 12.5~s, the radio
+access network contributed 31.2\%, and uplink bursts triggered TCP slow starts \cite{W3047439371}; on 5G
 mmWave the uplink was still insufficient for baseline edge detection \cite{W4390905995}.
 
 Two loops are routinely conflated. MTP runs from head motion to the updated image; interaction latency
 runs from a user's action to its visible consequence. In a crane simulator, display delays of 0--30~ms
 affected performance, whereas controller delay mattered only at 800~ms \cite{W3086540722}. Quoted targets
-range from 5~ms \cite{W3048503162} and 13~ms \cite{W2561715836} to 50~ms \cite{W3133913697} and 100~ms
-\cite{W2898344194,W4282961825}. The spread is not noise. It reflects which loop is meant, and whether
-reprojection or local tracking already absorbs part of the delay.
+range from 5~ms \cite{W3048503162} to 100~ms \cite{W2898344194}. The spread is not noise: it reflects
+which loop is meant, and whether reprojection or local tracking already absorbs part of the delay.
 
-Budgets are also set on the mean, while users feel the tail. Frame sizes stay bursty even under
-constant-bitrate coding \cite{W4379468406}, the 3GPP XR traffic model underestimated effective bitrate by
-25\% on one headset \cite{W4399340506}, and on 802.11ac round-trip delay reached 228~ms
-\cite{W2915235041}. A budget met on average can still miss many frames. Direct measurement is cheap, with
-a photosensor rig \cite{W2890615649} or a phone camera with under 10~ms uncertainty \cite{W3012329178},
-yet latency studies seldom report percentiles or jitter. How delay variation translates into experience
-is taken up in \cref{sec:assure}; the transport and scheduling that shape the tail are in
-\cref{sec:provision}.
+Budgets are set on the mean, while users feel the tail. The 3GPP XR traffic model underestimated
+effective bitrate by 25\% on one headset \cite{W4399340506}, so a budget met on average can still miss
+many frames. Latency studies seldom report percentiles or jitter, although a phone camera can measure delay to within
+10~ms \cite{W3012329178}. How jitter is perceived and
+how transport shapes it are treated in \cref{sec:assure,sec:provision}.
 
 \subsection{How to hide delay}
 
-Every hiding technique lets the last stage on the device correct a result computed for an earlier state.
-It can therefore correct only what the device observes locally. Four families differ in what that is.
+Every hiding technique lets the last stage on the device correct a result computed for an earlier state,
+so it can correct only what the device observes locally. Four families differ in what that is.
 
 \emph{Reprojection} (time-warp) shifts the last received frame to the newest head pose just before
 display. It is the established success. Post-render warping removed up to 80\% of the aiming penalty of
-80~ms added latency \cite{W3089399051}; stalls of up to four frames at 90~Hz went unnoticed, and
-reprojection helped from eight frames upward \cite{W4301184864}. With reprojection active, CloudVR users
-did not notice 20~ms of added network latency \cite{W2896076858} and ALVR users hardly noticed round-trip
-times up to 90~ms \cite{W3095344018}, although CloudXR quality fell from 75~ms \cite{W4402156718}.
-Reprojection has moved from rotation to translation \cite{W4408848620}, and selective time-warp leaves
-head-locked layers untouched \cite{W2908115098}. Its limit is fundamental. It corrects the viewpoint,
-not the scene: moving objects, disoccluded regions and the outcome of a user's action remain stale.
+80~ms added latency \cite{W3089399051}, and stalls of up to four frames at 90~Hz went unnoticed
+\cite{W4301184864}. With reprojection active, ALVR users hardly noticed round-trip times up to 90~ms
+\cite{W3095344018}, although CloudXR quality fell from 75~ms \cite{W4402156718}. Its limit is
+fundamental: it corrects the viewpoint, not the scene. Moving objects, disoccluded regions and the outcome
+of a user's action remain stale.
 
-\emph{Prediction and pre-rendering} render for where the user will be. Motion predictors trained on
-more than 840,000 samples let an edge pre-render frames \cite{W3094082851}, and rendering beyond the
-field of view, sized to the current latency, reduced delivery latency by about 22\% in a simulation
-driven by real user data \cite{W3161249521}. These methods trade bandwidth for margin, and their gain is
-bounded by the prediction horizon, which \cref{sec:anticipate} treats. \emph{Speculation} goes further and
-pre-renders every reachable state: Furion prefetched pre-rendered panoramas for each grid point, at about
-132~Mbps on average \cite{W2940859338}. It works only where the state space is small.
+\emph{Prediction and pre-rendering} render for where the user will be. Rendering beyond the field of
+view, sized to the current latency, reduced delivery latency by about 22\% in a simulation driven by real
+user data \cite{W3161249521}. Such methods trade bandwidth for margin, and the prediction horizon bounds
+their gain (\cref{sec:anticipate}). \emph{Speculation} goes further and pre-renders every reachable state:
+Furion prefetched panoramas for each grid point at about 132~Mbps \cite{W2940859338}. It works only where
+the state space is small.
 
 \emph{Local tracking} hides the staleness of remote perception. Without it, 16.7~ms of offload latency
 raised false detections from 0 to 31.56\%; with tracking and region-of-interest encoding, offload latency
 also fell from 34.56 to 17.23~ms on 2.4~GHz Wi-Fi \cite{W2965289829}. CloudAR held 30 frames per second
-with at least 97\% recognition accuracy \cite{W2765872303}, Jaguar reached about 33~ms end to end
-\cite{W2896416526}, and the pattern holds on HoloLens \cite{W4282961825}. Replicated across independent
-groups, this is the design rule of edge AR.
+with at least 97\% recognition accuracy \cite{W2765872303}. Local tracking is the established design rule of edge AR.
 
-\emph{Hybrid fallback} keeps interactive objects on the device, so the delay-sensitive part never
-crosses the network \cite{W4389296467,W3080913128}. No family hides loss. Users of remote rendering rated packet
-loss as worse than added delay \cite{W3095344018,W4404916373}, so a design that hides delay well can
-still fail on an unreliable link. Nor can any of them hide the state of other users, which
-\cref{sec:connect} treats.
+\emph{Hybrid fallback} keeps interactive objects on the device, so the delay-sensitive part never crosses
+the network \cite{W4389296467}. No family hides loss: ALVR users rated packet loss as worse than added
+delay \cite{W3095344018}, so delay hiding offers no protection on an unreliable link. Nor can any family hide
+the state of other users (\cref{sec:connect}).
 
 \subsection{What it costs the device}
 
-Device energy is the main argument for offloading and the most contested result. Models promise savings
-of 63\% \cite{W2608841173} and 85\% \cite{W4388068949}. Measurements disagree with each other. Edge
-offloading halved smartphone energy for AR on average \cite{W2983318720}, and an edge VR testbed lowered
-client power \cite{W4296339041}. A Quest Pro, however, drained its battery 15\% faster with wireless
+Device energy is the main argument for offloading and its most contested result. Models promise savings
+of up to 85\% \cite{W4388068949}, but measurements disagree. Edge offloading halved smartphone energy for
+AR on average \cite{W2983318720}, whereas a Quest Pro drained its battery 15\% faster with wireless
 offloading than with local rendering \cite{W4362489903}, and Air Link on a Quest~2 also cost more energy
 \cite{W4387913063}. DeepDecision measured about 2900~mW for offloading regardless of bitrate and frame
-rate \cite{W2792220137}, whereas most models scale energy with transmitted data. The likely reason is
-what the models leave out: the radio's tail energy and the power of the decoder and display. Offloading moves load from the GPU to the radio and the decoder, and whether that
-saves energy depends on the device, the codec and the link. None of these studies reports heat,
-so the thermal side of the trade-off, which also bounds sustained local rendering, is unmeasured.
+rate \cite{W2792220137}, whereas most models scale energy with transmitted data. The models omit the radio's
+tail energy and the power of the decoder and display. Offloading moves load from the GPU to the radio and
+the decoder, so the saving depends on device, codec and link. None of these studies reports heat, so the
+thermal trade-off, which also bounds sustained local rendering, is unmeasured.
 
 \begin{openproblems}
 \item \textbf{Which split point is best for a given scene, device and link?} Frame, layer, depth and
   Gaussian splits are each evaluated against their own baseline. A common benchmark with fixed scenes,
-  devices and network traces would rank them and show when each wins.
+  devices and network traces would rank them.
 \item \textbf{Do learned placement controllers survive real render times and real links?} They are
-  trained and tested on synthetic task sizes and channels. Replaying measured render times, head motion,
-  5G and Wi-Fi traces under the 3GPP XR traffic profile would show which gains hold.
-\item \textbf{When does offloading save device energy?} Models predict large savings; measurements on
-  standalone headsets found the opposite \cite{W4362489903,W4387913063}. Component-level measurements of
-  radio, decoder, display and GPU across headsets, codecs and links would settle the direction.
-\item \textbf{How should a budget account for the tail and for interaction?} Budgets are set on mean
-  MTP, while users feel late frames and delayed consequences of their actions. Studies that vary the delay
-  distribution and the loop affected, with reprojection on and off, would turn targets into derived budgets.
+  trained on synthetic task sizes and channels. Replaying measured render times, head motion and 5G or
+  Wi-Fi traces would show which gains hold.
+\item \textbf{When does offloading save device energy?} Models predict large savings; headset
+  measurements found the opposite \cite{W4362489903,W4387913063}. Component-level measurements of radio,
+  decoder, display and GPU across headsets, codecs and links would settle the direction.
+\item \textbf{How should a budget account for the tail and for interaction?} Budgets target mean MTP,
+  while users feel late frames and delayed consequences of actions. Studies varying the delay distribution
+  and the affected loop, with reprojection on and off, would yield derived budgets.
 \item \textbf{Can edge AR scale on a shared uplink?} Real-network evidence is single-user and
   pessimistic \cite{W4390905995,W3047439371}. A 5G or Wi-Fi testbed scheduling several AR camera uplinks
   in one cell would test whether perception offload scales.

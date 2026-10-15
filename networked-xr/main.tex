@@ -1,31 +1,56 @@
-\documentclass[11pt]{article}
-\input{preamble}
+\documentclass[acmsmall,screen]{acmart}
+\input{preamble_acm}
 
-\title{\textbf{Carrying Immersion over Networks}\\[0.3em]
-  \large A Systematic Review of Networked Extended Reality, 2016--2026}
-\author{}
-\date{\input{data/build_date}}
+\setcopyright{none}
+\acmJournal{CSUR}
+\acmYear{2026}
 
 \begin{document}
-\maketitle
+
+\title{Carrying Immersion over Networks: A Survey of Networked Extended Reality}
+
+\author{Anonymous}
+\affiliation{%
+  \institution{To be completed}
+  \city{}
+  \country{To be completed}}
+
 \input{sections/00_abstract}
 
-\IfFileExists{sections/01_introduction.tex}{\input{sections/01_introduction}}{}
-\IfFileExists{sections/04_framework.tex}{\input{sections/04_framework}}{}
-\IfFileExists{sections/05_encode.tex}{\input{sections/05_encode}}{}
-\IfFileExists{sections/06_anticipate.tex}{\input{sections/06_anticipate}}{}
-\IfFileExists{sections/07_compute.tex}{\input{sections/07_compute}}{}
-\IfFileExists{sections/08_provision.tex}{\input{sections/08_provision}}{}
-\IfFileExists{sections/09_connect.tex}{\input{sections/09_connect}}{}
-\IfFileExists{sections/10_assure.tex}{\input{sections/10_assure}}{}
-\IfFileExists{sections/11_synthesis.tex}{\input{sections/11_synthesis}}{}
-\IfFileExists{sections/12_agenda.tex}{\input{sections/12_agenda}}{}
-\IfFileExists{sections/13_conclusion.tex}{\input{sections/13_conclusion}}{}
+\begin{CCSXML}
+<ccs2012>
+<concept><concept_id>10003033.10003079</concept_id><concept_desc>Networks~Network performance evaluation</concept_desc><concept_significance>300</concept_significance></concept>
+<concept><concept_id>10003033.10003106.10003113</concept_id><concept_desc>Networks~Mobile networks</concept_desc><concept_significance>500</concept_significance></concept>
+<concept><concept_id>10003120.10003121.10003124.10010866</concept_id><concept_desc>Human-centered computing~Virtual reality</concept_desc><concept_significance>500</concept_significance></concept>
+<concept><concept_id>10003120.10003121.10003124.10010392</concept_id><concept_desc>Human-centered computing~Mixed / augmented reality</concept_desc><concept_significance>300</concept_significance></concept>
+<concept><concept_id>10002951.10003227.10003251</concept_id><concept_desc>Information systems~Multimedia information systems</concept_desc><concept_significance>300</concept_significance></concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Networks~Mobile networks}
+\ccsdesc[300]{Networks~Network performance evaluation}
+\ccsdesc[500]{Human-centered computing~Virtual reality}
+\ccsdesc[300]{Human-centered computing~Mixed / augmented reality}
+\ccsdesc[300]{Information systems~Multimedia information systems}
 
-\begingroup\scriptsize\setlength{\bibsep}{0.6pt}\setlength{\columnsep}{14pt}
-\renewcommand{\bibsection}{\section*{References}}
-\begin{multicols}{2}
-\bibliographystyle{unsrtnat}
+\keywords{extended reality, virtual reality, augmented reality, 360-degree video, volumetric video,
+viewport prediction, edge computing, remote rendering, split rendering, motion-to-photon latency, 5G, 6G,
+tactile internet, holographic communication, quality of experience}
+
+\maketitle
+
+\input{sections/01_introduction}
+\IfFileExists{sections/02_background.tex}{\input{sections/02_background}}{}
+\input{sections/04_framework}
+\input{sections/05_encode}
+\input{sections/06_anticipate}
+\input{sections/07_compute}
+\input{sections/08_provision}
+\input{sections/09_connect}
+\input{sections/10_assure}
+\input{sections/11_synthesis}
+\input{sections/12_agenda}
+\input{sections/13_conclusion}
+
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{data/references}
-\end{multicols}\endgroup
 \end{document}

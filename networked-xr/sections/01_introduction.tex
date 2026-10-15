@@ -25,7 +25,36 @@ joint allocation of radio, computing and energy. Haptics researchers pursued the
 \cite{W3088582486}, or one technology, such as edge computing \cite{W3133913697,W2902319104}, ultra-low
 latency \cite{W4362585626} or the 6G metaverse \cite{W4312940001,W4315497913}. What is missing is a single
 frame that shows how these parts fit together, where they trade against each other, and how far each has
-been tested.
+been tested. \Cref{tab:surveys} places representative surveys against the six functions used in this
+survey.
+
+\begin{table}[t]
+\centering\small
+\caption{Representative surveys of networked XR and the functions of \cref{sec:framework} that each
+treats as a primary subject ($\bullet$) or in part ($\circ$). Earlier surveys follow one medium or one
+technology; this survey covers all six functions and the couplings between them.}\label{tab:surveys}
+\setlength{\tabcolsep}{3.2pt}
+\newcommand{\y}{$\bullet$}\newcommand{\p}{$\circ$}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X c >{\raggedright\arraybackslash}p{3.3cm}cccccc@{}}
+\toprule
+Survey & Year & Scope & Enc. & Ant. & Comp. & Prov. & Conn. & Assure\\
+\midrule
+Bastug et al.\ \cite{W2561715836} & 2017 & Interconnected VR & & \p & \p & \y & \p & \\
+Elbamby et al.\ \cite{W2784711283} & 2018 & Low-latency, reliable VR & & \p & \y & \y & & \\
+Antonakoglou et al.\ \cite{W2811040154} & 2018 & Haptic communication & \y & & & \p & \y & \p\\
+Sukhmani et al.\ \cite{W2902319104} & 2018 & Edge caching and computing & & \y & \y & \p & & \\
+Fan et al.\ \cite{W2971680322} & 2019 & 360-degree video streaming & \p & \y & & \p & & \p\\
+Yaqoob et al.\ \cite{W3038754372} & 2020 & Adaptive 360-degree streaming & \p & \y & & & & \p\\
+Promwongsa et al.\ \cite{W3088582486} & 2020 & Tactile internet & \p & & & \y & \y & \\
+Liu et al.\ \cite{W3096564590} & 2021 & Point-cloud streaming & \y & \y & & & & \p\\
+Siriwardhana et al.\ \cite{W3133913697} & 2021 & Mobile AR with edge computing & & & \y & \p & & \\
+Xu et al.\ \cite{W4312940001} & 2022 & Edge-enabled metaverse & & & \y & \y & \p & \p\\
+Hazarika and Rahmati \cite{W4362585626} & 2023 & Ultra-low-latency XR & & & \p & \y & & \p\\
+Ali et al.\ \cite{W4390204075} & 2023 & Metaverse networking and security & & & \p & \y & \p & \y\\
+\textbf{This survey} & 2026 & Networked XR as a whole & \y & \y & \y & \y & \y & \y\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \paragraph{Organising idea.} We organise the field by \emph{function}: the six things any networked XR
 system must do, whatever its medium and access network (\cref{sec:framework}). A system must
@@ -52,3 +81,10 @@ vocabularies can be compared on the same terms.
   \item \textbf{Nine cross-cutting gaps} and a research agenda ordered by dependency
         (\cref{sec:synthesis,sec:agenda}).
 \end{enumerate}
+
+\paragraph{Organisation.} \Cref{sec:background} introduces the XR loop, the motion-to-photon deadline
+and the properties of XR traffic for readers new to the area. \Cref{sec:framework} presents the
+functional framework. \Cref{sec:encode,sec:anticipate,sec:compute,sec:provision,sec:connect,sec:assure}
+treat the six functions in loop order, and each closes with its open problems. \Cref{sec:synthesis}
+draws the cross-cutting gaps together, \cref{sec:agenda} proposes a research agenda, and
+\cref{sec:conclusion} concludes.

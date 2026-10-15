@@ -2,23 +2,22 @@
 
 Every networked XR system must first decide what its content is: a sphere of pixels, a set of camera
 views, a cloud of points, the parameters of a learned scene model or a stream of force samples. The
-design question is which representation travels and how it is compressed. The choice is
-made before any network algorithm acts, and it fixes four quantities that every later function inherits.
-The \emph{bitrate floor} is the rate below which quality collapses, and it sets what the network must
-supply (\cref{sec:provision}). The \emph{encoder delay} is spent before the first bit leaves the sender
-and counts against the interaction budgets of \cref{sec:compute,sec:connect}. The \emph{decoder cost}
-lands on a battery-powered headset or phone. \emph{Viewport dependence} decides whether the stream can be
-cut down to what the user will see, and therefore whether prediction and prefetching
-(\cref{sec:anticipate}) have anything to act on.
+design question is which representation travels and how it is compressed. The choice precedes any
+network algorithm and fixes four quantities that later functions inherit. The \emph{bitrate floor},
+below which quality collapses, sets what the network must supply (\cref{sec:provision}). The
+\emph{encoder delay} is spent before the first bit leaves the sender and counts against the interaction
+budgets of \cref{sec:compute,sec:connect}. The \emph{decoder cost} lands on a battery-powered headset or
+phone. \emph{Viewport dependence} decides whether the stream can be cut to what the user will see, and
+therefore whether prediction (\cref{sec:anticipate}) has anything to act on.
 
 We group representations into four families by what they send (\cref{tab:encode-families}).
 \emph{Image-based} representations send what cameras see and reuse the 2D video chain.
 \emph{Geometry-based} representations send the shape of the scene as points or meshes.
-\emph{Learned} representations send a model of the scene, or a description of its meaning, and let the
-receiver regenerate the content. \emph{Signal-based} representations send a physical signal, force or
-light, sampled by the rules of the sense that receives it. \Cref{fig:encode-chains} follows a chain from
-each family from capture to display. Adaptation and caching are treated in \cref{sec:anticipate}, haptic
-transport and holoportation in \cref{sec:connect}.
+\emph{Learned} representations send a model of the scene, or its meaning, for the receiver to
+regenerate. \emph{Signal-based} representations send a physical signal sampled by the rules of the sense
+that receives it. \Cref{fig:encode-chains} follows one chain per family from capture to display.
+Adaptation and caching belong to \cref{sec:anticipate}, haptic transport and holoportation to
+\cref{sec:connect}.
 
 \begin{figure}[t]
 \centering
@@ -124,38 +123,34 @@ Signal & Holographic: light field or phase pattern & 6.63~TBps by arithmetic; 17
 \end{table}
 
 \subsection{Image-based: send what a camera sees}
-Image-based representations keep the 2D video chain intact and inherit its hardware encoders and
-decoders. Their questions sit at the two ends of that chain: how the scene is mapped onto rectangles, and
-how many decoders the client can afford.
+Image-based representations keep the 2D video chain and inherit its hardware encoders and decoders.
+Their questions sit at its two ends: how the scene maps onto rectangles, and how many decoders the
+client can afford.
 
 \emph{Projected 360-degree video} assumes a viewer who turns the head but stays in place (3DoF), and wins
-when that holds. The established result is that concentrating bits on the viewport saves bitrate, but
-less than it saves pixels: Oculus's offset cube used fewer than half the pixels of an equirectangular
-frame for similar view quality, yet saved only 5.6--16.4\% of bitrate \cite{W2623027537}. The delivery
-unit is contested. Viewport-specific versions need no reassembly but multiply storage. Tiles share one
-encode but cost 7.3--10.4\% in coding efficiency \cite{W2896840651}, up to 37.3\% for small tiles at low
-resolution \cite{W2623784065}, and the client pays for them: Flare raised phone CPU load from 18\% to
+when that holds. Concentrating bits on the viewport saves bitrate, but less than it saves pixels:
+Oculus's offset cube used fewer than half the pixels of an equirectangular frame for similar quality,
+yet saved only 5.6--16.4\% of bitrate \cite{W2623027537}. The delivery unit is contested.
+Viewport-specific versions need no reassembly but multiply storage. Tiles share one encode but cost
+7.3--10.4\% in coding efficiency, and the client pays for them: Flare raised phone CPU load from 18\% to
 58\% \cite{W2896840651}, and streaming took 28.5\% of headset power \cite{W2626466913}, both on
-2017--2018 hardware. Gaze is the stronger lever: gaze-based quantisation saved 40--47\% in cloud VR gaming in a subjective test \cite{W3174397927},
-and gaze-contingent compression was five times more effective when motion-to-photon (MTP) latency stayed
-below 15~ms \cite{W4214531162}. Foveation is thus a coding gain that \cref{sec:compute} pays for in
-latency.
+2017--2018 hardware. Gaze is the stronger lever. Gaze-based quantisation saved 40--47\% of bitrate in a
+subjective test of cloud VR gaming \cite{W3174397927}, and gaze-contingent compression was five times
+more effective when motion-to-photon (MTP) latency stayed below 15~ms \cite{W4214531162}. Foveation is
+thus a coding gain that \cref{sec:compute} pays for in latency.
 
-\emph{Multi-view plus depth} sends several colour and depth streams and lets the receiver synthesise the
-view, which gives limited six degrees of freedom (6DoF) with ordinary video codecs. It assumes the
-receiver can afford view synthesis and the viewer stays within the span the cameras covered. It wins in
-live, two-way systems because it needs no slow 3D encoder. Project Starline sends four colour and three
-depth H.265 streams at 30--100~Mbit/s and fuses them at the receiver, because real-time mesh or
-point-cloud compression was not possible at its resolution \cite{W4200107448}; MetaStream likewise codes
-RGB-D as 2D video \cite{W4387212733}. MPEG Immersive Video (MIV)
-standardises this path, with atlas packing \cite{W4210296418} and view synthesis at the decoder
-\cite{W3034756801}. Practice and evidence diverge: deployed telepresence uses this family, yet no study
-has streamed MIV to users over a real network, and light-field delivery has been tested only offline
-\cite{W2902432774}.
+\emph{Multi-view plus depth} sends colour and depth streams and lets the receiver synthesise the view,
+giving limited six degrees of freedom (6DoF) with ordinary video codecs. It assumes the receiver can
+afford view synthesis and the viewer stays within the cameras' span. It wins in live, two-way systems
+because it needs no slow 3D encoder. Project Starline sends four colour and three depth H.265 streams at
+30--100~Mbit/s and fuses them at the receiver, because real-time mesh or point-cloud compression was not
+possible at its resolution \cite{W4200107448}. MPEG Immersive Video (MIV) standardises this path with
+atlas packing \cite{W4210296418}. Practice and evidence diverge: deployed telepresence uses this family,
+yet no study has streamed MIV to users over a real network.
 
 \subsection{Geometry-based: send the shape}
-Geometry-based representations send the scene itself, so the receiver can render any viewpoint. The price
-is weight. Raw point clouds need 720~Mbit/s at 200K points and 30~fps \cite{W3021314748}, and about
+Geometry-based representations send the scene itself, so the receiver can render any viewpoint. The
+price is weight: raw point clouds need 720~Mbit/s at 200K points and 30~fps \cite{W3021314748} and about
 5~Gbit/s at one million points \cite{W4362496249}, one to three orders of magnitude more than 2D video.
 
 Point-cloud codecs trade compression ratio against speed, and the trade is established. V-PCC projects
@@ -163,20 +158,18 @@ patches onto planes and reuses video codecs; it reaches lossy ratios of 100--500
 to encode 30 frames of one object \cite{W3096788322}. G-PCC and Draco code geometry in 3D, run fast and
 compress less, so live systems avoid V-PCC. In VR2Gather, the MPEG Anchor codec cut 281.8~Mbit/s to
 19.0~Mbit/s but raised latency from 40.6 to 278.7~ms, and parallel tiles brought it back to 90.6~ms
-\cite{W4362496249}: coding, not transit, set the delay. Tuning standard codecs yields single-digit gains
-(2--6\% BD-rate from V-PCC rate control \cite{W4405304599}); larger gains come from changing the
-representation, as when 3D sub-sampling cut bitrate by up to 48.5\% at equal quality \cite{W4379806044}
-and 3D patch coding matched V-PCC's ratio with real-time decoding \cite{W4379928158}. The receiver is the
-second constraint: Hermes reached 30~fps on phones only by exploiting inter-frame correlation
-\cite{W4387967921}. No codec wins everywhere; a measurement of Draco, G-PCC, V-PCC and two neural codecs
+\cite{W4362496249}: coding, not transit, set the delay. Changing the representation within the family
+also pays: 3D sub-sampling cut bitrate by up to 48.5\% at equal quality \cite{W4379806044}. The receiver
+is the second constraint: Hermes reached 30~fps on phones only by exploiting inter-frame correlation
+\cite{W4387967921}. No codec wins everywhere; a comparison of Draco, G-PCC, V-PCC and two neural codecs
 found that the best choice depends on content and viewing behaviour \cite{W4321488303}.
 
 Geometry's advantage is a richer viewport dependence: points can be culled by visibility, occlusion and
 distance, not only by direction. ViVo saved 40\% of bandwidth on average with SSIM above 0.99, but only
-10\% for phone users on the same content \cite{W3021314748}, and gaze-driven delivery on a HoloLens~2
-saved up to 67\% \cite{W4399323898}. Meshes are the less explored member: static mesh codecs have been
-benchmarked for rate and runtime \cite{W2911819174}, and a reconstructed mesh for robot teleoperation
-needed 14~Mbit/s on average \cite{W2966611292}.
+10\% for phone users on the same content \cite{W3021314748}; gaze-driven delivery on a HoloLens~2 saved
+up to 67\% \cite{W4399323898}. Meshes are the less explored member: static mesh codecs have been
+benchmarked only for rate and runtime \cite{W2911819174}, and a reconstructed mesh for robot
+teleoperation needed 14~Mbit/s on average \cite{W2966611292}.
 
 \subsection{Learned: send a model or a meaning}
 Learned representations replace explicit content with something the receiver must regenerate. They
@@ -185,65 +178,62 @@ promise the largest savings and move the most work to the two ends.
 \emph{Neural scene representations} (NeRF, 3D Gaussian splatting) send model parameters. The most
 deployable design reuses existing hardware: V$^3$ bakes dynamic Gaussians into 2D videos for H.264
 decoders and reaches 32.97~dB PSNR at 0.532~MB per frame and 27~fps on a phone \cite{W4404525293}. That
-rate is not small: sustained at 30~fps it is about 128~Mbit/s, the range of multi-view video, so the gain
-is rendering freedom rather than bitrate. Training takes about a minute per frame on a desktop GPU, which
-rules out live content, and download was measured only on an internal network. Layered Gaussians
-\cite{W4402704690}, variable-bitrate NeRF video \cite{W4400667199} and splat streaming at 30~fps on
-phones \cite{W4416477288} point towards adaptation; error control and quality assessment remain open
-\cite{W4408847683}.
+rate is not small: at 30~fps it is about 128~Mbit/s, the range of multi-view video, so the gain is
+rendering freedom rather than bitrate. Training takes about a minute per frame on a desktop GPU, which
+rules out live content, and download was measured only on an internal network. Splat streaming at
+30~fps on phones points towards adaptation \cite{W4416477288}; error control and quality assessment
+remain open \cite{W4408847683}.
 
 \emph{Semantic and generative codecs} send meaning and assume that sender and receiver share a knowledge
 base or a generative model. They report the largest savings and the weakest comparisons. WiserVR sent
-1.81~Mbit instead of 28.3~Mbit for 20 frames, in an AWGN simulation that excluded the delay of sharing the
-knowledge base \cite{W4324296656}; MagicStream reports up to 1195$\times$ less bandwidth
-\cite{W4404034698}. The one generative prototype timed end to end cut bandwidth by 99.93\% but raised
-latency from 980~ms to 13.66~s \cite{W4403677254}. Each paper defines fidelity differently, task metrics can disagree with perceived realism
-\cite{W4385452934}, and the baseline is usually BPG with LDPC rather than HEVC or VVC.
-An order-of-magnitude saving is plausible; its price in inference delay and device energy is assumed
-rather than measured.
+1.81~Mbit instead of 28.3~Mbit for 20 frames, in an AWGN simulation that excluded the delay of sharing
+the knowledge base \cite{W4324296656}. The one generative prototype timed end to end cut bandwidth by
+99.93\% but raised latency from 980~ms to 13.66~s \cite{W4403677254}. Each study defines fidelity
+differently, task metrics can disagree with perceived realism \cite{W4385452934}, and the baseline is
+usually BPG with LDPC rather than HEVC or VVC. An order-of-magnitude saving is plausible; its price in
+inference delay and device energy is assumed rather than measured.
 
 \subsection{Signal-based: send the physical signal}
 Signal-based representations code a physical quantity by the limits of the sense that receives it.
 Haptic and holographic content sit at opposite ends of the rate scale.
 
 \emph{Haptic signals} need little rate and strict timing. Kinaesthetic samples travel at 1~kHz or more to
-keep the control loop stable, and perceptual deadband coding sends a sample only when its change exceeds a
-Weber fraction (7--15\% for force), removing 80--90\% of packets without perceptible loss. Two
+keep the control loop stable, and perceptual deadband coding sends a sample only when its change exceeds
+a Weber fraction (7--15\% for force), removing 80--90\% of packets without perceptible loss. Two
 independent implementations of the IEEE~1918.1.1 kinaesthetic codec reproduced the same rates and errors
-\cite{W2912555763}, an established result, though for one contact point. Vibrotactile
-coding is open-loop and may use block transforms with tens of milliseconds of delay \cite{W2911218692}.
-Learned multichannel codecs report cuts of 80--92\%, but against each other rather than a standard
-\cite{W7131889935,W4406137775}. Deadband coding also makes traffic bursty, unlike the
-periodic 1~ms flow that transport studies assume.
+\cite{W2912555763}, an established result, though for one contact point. Vibrotactile coding is
+open-loop and may use block transforms with tens of milliseconds of delay \cite{W2911218692}; learned
+tactile codecs report cuts of 80--92\%, but against other learned codecs rather than a standard
+\cite{W7131889935}. Deadband coding also makes traffic bursty, unlike the periodic 1~ms flow that
+transport studies assume.
 
-\emph{Holographic content} has no agreed representation, and its requirement figures depend on an unstated
-one. Akyildiz and Guo define a hologram as a recorded light field, then adopt point clouds as the working
-form; their light-field display example needs 221~GB per frame, or 6.63~TBps at 30~fps
+\emph{Holographic content} has no agreed representation, and its requirement figures depend on an
+unstated one. Akyildiz and Guo define a hologram as a recorded light field, then adopt point clouds as
+the working form; their light-field display example needs 221~GB per frame, or 6.63~TBps at 30~fps
 \cite{W4300960574}. Measured systems used 5--100~Mbps for compressed point clouds over live 5G
 \cite{W4312662428} and 173~Mbps for full-duplex light-field telepresence \cite{W3176472668}. The figures
 do not estimate one quantity: one is uncompressed display arithmetic, the other compressed capture. For
 live use, codec delay binds first: V-PCC needs 11--42 minutes to encode one second \cite{W4309030584}.
-Optical holograms are only now becoming coded media \cite{W4417448513}.
 
-\paragraph{The choice moves cost; it does not remove it.} No representation is cheap at both ends. Image-based content is light on the sender and heavy on the wire
-and the decoders. Geometry cuts the wire at the price of encoder delay. Learned
-representations cut it further and move the work into training and inference. Choosing a representation is therefore choosing where to
-spend: on the network, the sender's encoder or the receiver's processor, and the choice cannot be made
-alone. Remote rendering (\cref{sec:compute}) collapses any representation back into 2D video at the
-edge, trading decoder cost for MTP latency. Viewport dependence bounds what prediction can save
-(\cref{sec:anticipate}), and encoder delay decides which representations two-way telepresence can use
-(\cref{sec:connect}). The ratio--speed trade within each family is established; that new representations win
-across families is assumed, since none has been compared with the others at matched quality.
+\paragraph{The choice moves cost; it does not remove it.} No representation is cheap at both ends.
+Image-based content is light on the sender and heavy on the wire and the decoders. Geometry cuts the wire
+at the price of encoder delay. Learned representations cut it further and move the work into training
+and inference. Choosing a representation is therefore choosing where to spend: on the network, the
+sender's encoder or the receiver's processor. Nor can the choice be made alone. Remote rendering
+(\cref{sec:compute}) collapses any representation back into 2D video at the edge, trading decoder cost
+for MTP latency. Viewport dependence bounds what prediction can save (\cref{sec:anticipate}), and
+encoder delay decides which representations two-way telepresence can use (\cref{sec:connect}). The
+ratio--speed trade within each family is established; that new representations win across families is
+assumed, since none has been compared with the others at matched quality.
 
 \begin{openproblems}
 \item \textbf{Which representation minimises end-to-end cost for a given scene?} Point clouds, meshes,
   multi-view video and Gaussian splats have never been compared on the same content at matched perceived
-  quality. Encoding shared scenes in all four and streaming them over replayed 5G and Wi-Fi traces would
-  measure bitrate, encoder delay and decoder load together.
+  quality. Streaming shared scenes in all four over replayed 5G and Wi-Fi traces would measure bitrate,
+  encoder delay and decoder load together.
 \item \textbf{Do semantic and generative savings survive latency?} Reported savings come from AWGN
-  simulations with weak baselines. Comparing semantic codecs with HEVC, VVC and V-PCC at matched rated
-  quality on a real 5G link, timing encoder and decoder inference, would show whether they suit
-  interactive use.
+  simulations with weak baselines. Comparing semantic codecs with HEVC, VVC and V-PCC at matched quality
+  on a real 5G link, timing inference at both ends, would show whether they suit interactive use.
 \item \textbf{How should new representations be judged?} No rating data exist for compressed Gaussian,
   neural or generative reconstructions viewed in a headset, so PSNR and LPIPS are unvalidated for their
   artefacts. A 6DoF rating study across codecs and rates would provide ground truth.
@@ -251,10 +241,9 @@ across families is assumed, since none has been compared with the others at matc
   bitrate ladders and loss handling. Rate control driven by measured capacity, judged by frame-deadline
   misses, would test whether codec gains hold on cellular links.
 \item \textbf{What does a hologram actually cost to send?} Requirement tables rest on display arithmetic,
-  not on captured content. Coding one scene as point clouds, splats, light fields and phase holograms and
+  not captured content. Coding one scene as point clouds, splats, light fields and phase holograms and
   recording the traffic would replace assumed figures with measured ones.
 \item \textbf{How do coded haptic streams behave under real loss?} Haptic codecs are evaluated on one-off
   recordings with one contact point. Shared multi-point recordings and a user study of deadband and
-  vibrotactile codecs over replayed network impairments would test perceptual transparency where it
-  matters.
+  vibrotactile codecs over replayed impairments would test perceptual transparency.
 \end{openproblems}

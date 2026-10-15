@@ -1,0 +1,73 @@
+\section{Background: The Networked XR Loop}\label{sec:background}
+
+This section introduces the concepts that the rest of the survey relies on. Readers familiar with XR
+systems may skip to \cref{sec:framework}.
+
+\subsection{From standalone to networked XR}
+XR spans a continuum. Virtual reality (VR) replaces the user's view with a synthetic one. Augmented
+reality (AR) overlays virtual objects on the physical world, and mixed reality anchors them in it so
+that they respond to physical surfaces. Each device tracks the user's head, and often the hands and eyes,
+and redraws the scene for every new pose. Two levels of freedom matter for networking. With \emph{three
+degrees of freedom} (3DoF) the user can only rotate the head, as in a 360-degree video. With \emph{six
+degrees of freedom} (6DoF) the user can also move through the scene, as in a game or a volumetric
+capture. A 3DoF scene can be prepared in advance as a sphere of pixels. A 6DoF scene must be rendered or
+synthesised for each viewpoint, so it needs either geometry on the device or rendering close to it.
+
+A standalone headset performs the whole loop locally: it senses a pose, renders, and displays the result.
+Three pressures push parts of this loop into the network. First, \emph{content} may be too large to
+store, or may be produced live elsewhere, as with 360-degree broadcasts and volumetric captures. Second,
+\emph{computation} may exceed what a light, battery-powered device can sustain, as with photorealistic
+rendering and AR scene understanding \cite{W3133913697}. Third, \emph{other participants}, whether
+people or machines, are by definition remote \cite{W2561715836}.
+
+\subsection{The motion-to-photon deadline}
+The defining constraint of XR is the \emph{motion-to-photon} (MTP) latency: the time from a head movement
+to the photons that show its consequence. When MTP exceeds roughly 15--20~ms the displayed world appears
+to lag or swim, which degrades presence and can cause simulator sickness. That budget leaves roughly
+14~ms for computation and communication together \cite{W2784711283}. Three properties of this deadline
+shape every design in this survey. First, it is \emph{per frame}: at 72--120 frames per second, each
+frame has its own deadline, and a late frame is a lost frame. Second, it applies to \emph{rotation} most
+strictly. Local reprojection can correct a slightly stale frame for a new head orientation, so the
+network-facing deadline for full interaction is looser than MTP, although it is still tight. Third, its
+\emph{tail} matters more than its mean, because occasional late frames are what users notice.
+
+\subsection{What XR traffic looks like}
+The traffic of a networked XR session differs from video streaming or web traffic in four ways
+(\cref{tab:background}). It is \emph{periodic and bursty}: rendered or decoded frames arrive at the
+display rate, each a burst of packets with its own deadline. It is \emph{bidirectional}: pose, controller
+input, camera frames and captured media flow upstream continuously, and the downstream content depends on
+them. It is \emph{viewport-dependent}: the user sees only a fraction of a 360-degree or volumetric scene
+at any moment, so the useful content depends on where the user looks. And it is often \emph{shared}:
+several users' updates must be reconciled into one consistent world. The first two properties make XR a
+real-time control problem rather than a throughput problem. The third creates the opportunity to send
+less. The fourth makes the network responsible for consistency as well as delivery.
+
+\begin{table}[t]
+\centering\small
+\caption{How networked XR traffic differs from conventional video streaming. Each row names a
+property, its consequence for the network, and the section that treats it.}\label{tab:background}
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{1.9cm}@{}}
+\toprule
+Property & Video streaming & Networked XR & Treated in\\
+\midrule
+Deadline & Seconds of buffer absorb delay & Each frame must arrive within a few tens of milliseconds & \cref{sec:compute,sec:provision}\\
+Direction & Downlink, with small requests upstream & Continuous uplink of pose, input, camera and capture & \cref{sec:compute,sec:connect}\\
+Viewport & The whole frame is shown & Only the viewport is seen, and it moves & \cref{sec:anticipate}\\
+Representation & 2D video frames & Spherical video, point clouds, meshes, neural fields, haptic signals & \cref{sec:encode}\\
+Participants & Independent viewers & Shared state, avatars, remote machines & \cref{sec:connect}\\
+Quality & Rebuffering, bitrate, video quality & Latency, judder, sickness, presence, task success & \cref{sec:assure}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Where the loop can run}
+A networked XR system distributes its loop over four tiers: the \emph{device}, the \emph{access network}
+(Wi-Fi or cellular), the \emph{edge} (servers at or near the access network) and the \emph{cloud}. Moving
+a function to a farther tier gains resources and loses time. An edge server one wireless hop away adds a
+few milliseconds of round-trip time, while a distant cloud data centre adds tens of milliseconds
+\cite{W2805833065}. Mobile edge computing, as standardised for 5G, exists largely to put rendering,
+caching and session state within the XR deadline \cite{W2902319104}. The access network is usually the
+least predictable part of the path. Wireless capacity, delay and loss vary with distance, blockage,
+interference and the number of users, and a directional millimetre-wave beam must follow a head that
+turns quickly. The framework in the next section builds on these four tiers.

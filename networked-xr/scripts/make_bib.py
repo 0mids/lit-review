@@ -37,7 +37,7 @@ def main():
     for r in df.sort_values("id").itertuples():
         key = r.id.rsplit("/", 1)[1]
         al = [a for a in (list(r.authors) if r.authors is not None else []) if a]
-        authors = " and ".join(tex_escape(a) for a in al[:3]) + (" and others" if len(al) > 3 else "")
+        authors = " and ".join(tex_escape(a) for a in al[:6]) + (" and others" if len(al) > 6 else "")
         kind = "inproceedings" if r.type in ("conference-paper", "conference-abstract") else \
                "incollection" if r.type == "book-chapter" else "phdthesis" if r.type == "dissertation" else "article"
         vf = "booktitle" if kind in ("inproceedings", "incollection") else "school" if kind == "phdthesis" else "journal"
@@ -45,7 +45,7 @@ def main():
         out.append(f"@{kind}{{{key},\n  author = {{{authors or 'Anonymous'}}},\n"
                    f"  title = {{{{{tex_escape(r.title)}}}}},\n  {vf} = {{{tex_escape(r.venue or 'n.p.')}}},\n"
                    f"  year = {{{int(r.year) if r.year == r.year else ''}}},\n"
-                   + "" + "}\n")
+                   + (f"  doi = {{{doi}}},\n" if doi else "") + "}\n")
     (HERE / "data" / "references.bib").write_text("\n".join(out))
     found = set(df.id)
     missing = sorted(k for k in cited if "https://openalex.org/" + k not in found)
