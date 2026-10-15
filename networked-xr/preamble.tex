@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{charter}
 \usepackage[scaled=0.92]{helvet}
-\usepackage[a4paper,margin=2.2cm,headheight=14pt]{geometry}
+\usepackage[a4paper,margin=2.0cm,headheight=14pt]{geometry}
 \usepackage{microtype}
 \usepackage{amsmath,amssymb}
 \usepackage[dvipsnames]{xcolor}
@@ -16,6 +16,7 @@
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric,shapes.misc,decorations.pathreplacing}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{xurl}
+\usepackage{multicol}
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=green!35!black,urlcolor=blue!60!black]{hyperref}
 \usepackage[nameinlink,capitalise,noabbrev]{cleveref}
 
@@ -34,7 +35,13 @@
 \definecolor{gapcolor}{HTML}{B03A2E}
 
 \setlist{itemsep=1pt,topsep=3pt}
-\setlength{\parskip}{2pt}
+\setlength{\parskip}{1pt}
+\linespread{0.985}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\usepackage[compact]{titlesec}
+\titlespacing*{\section}{0pt}{10pt plus 2pt minus 2pt}{5pt}
+\titlespacing*{\subsection}{0pt}{7pt plus 2pt minus 1pt}{3pt}
 \graphicspath{{figures/}}
 
 \newtcolorbox{openproblemsbox}{breakable,enhanced,colback=gapcolor!3,colframe=gapcolor!65!black,

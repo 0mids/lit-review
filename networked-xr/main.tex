@@ -9,8 +9,6 @@
 \begin{document}
 \maketitle
 \input{sections/00_abstract}
-\setcounter{tocdepth}{1}
-{\small\tableofcontents}
 
 \IfFileExists{sections/01_introduction.tex}{\input{sections/01_introduction}}{}
 \IfFileExists{sections/02_method.tex}{\input{sections/02_method}}{}
@@ -26,7 +24,10 @@
 \IfFileExists{sections/12_agenda.tex}{\input{sections/12_agenda}}{}
 \IfFileExists{sections/13_conclusion.tex}{\input{sections/13_conclusion}}{}
 
-{\footnotesize\setlength{\bibsep}{1.5pt}
+\begingroup\scriptsize\setlength{\bibsep}{0.6pt}\setlength{\columnsep}{14pt}
+\renewcommand{\bibsection}{\section*{References}}
+\begin{multicols}{2}
 \bibliographystyle{unsrtnat}
-\bibliography{data/references}}
+\bibliography{data/references}
+\end{multicols}\endgroup
 \end{document}
