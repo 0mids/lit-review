@@ -98,15 +98,21 @@ Whether learned models beat simple ones is contested. On the Tsinghua dataset, p
 Decision & Family & Idea & Assumes & Wins when & Limit\\
 \midrule
 \multirow{3}{=}{Predict} & Extrapolators & Persistence, linear or Kalman continuation of pose & Smooth motion over the horizon & Horizon $<$0.5~s; no training data & Blind to content and to sudden turns\\
+\addlinespace[2pt]
  & Learned sequence & LSTM or transformer over past trajectory & Training users and videos resemble test ones & Mid horizons on familiar content & Small margin over persistence; leakage-prone splits\\
+\addlinespace[2pt]
  & Content-aware, cross-user & Saliency, gaze or earlier viewers as priors & Content and viewers are shared & On-demand video at 2--10~s horizons & No prior for live or interactive XR\\
 \midrule
 \multirow{3}{=}{Fetch} & Heuristic, buffer-based & Rules map buffer level and view probability to quality & Buffer reflects throughput & Unknown or shifting networks & Hand-tuned; no notion of optimum\\
+\addlinespace[2pt]
  & Optimisation & Rate-utility allocation over tiles, cells or LoD & Accurate throughput and view probabilities & Good estimates; 6DoF visibility known & Fragile when estimates are wrong\\
+\addlinespace[2pt]
  & Learned (RL) & Policy learned from trace replay & Deployment matches training traces & Stable, well-sampled conditions & Degrades on unseen users and networks\\
 \midrule
 \multirow{3}{=}{Keep} & Popularity cache & LRU or LFU on independent tiles & Requests repeat as whole objects & Large caches; standard HTTP edges & Ignores viewport overlap\\
+\addlinespace[2pt]
  & Viewport-aware cache, prefetch & Place tiles or objects by predicted viewing & Viewers' attention overlaps & Popular on-demand content & Gains shown only against popularity baselines\\
+\addlinespace[2pt]
  & Shared delivery & Multicast or coded caching of common parts & Synchronised, similar requests & Co-located viewers of one stream & Asynchrony and subpacketisation\\
 \bottomrule
 \end{tabularx}
