@@ -211,4 +211,11 @@ if __name__ == "__main__":
                   f"\\newcommand{{\\fn{lab}Sh}}{{{100 * n / len(df):.1f}\\%}}",
                   f"\\newcommand{{\\fn{lab}Early}}{{{e:.1f}\\%}}",
                   f"\\newcommand{{\\fn{lab}Late}}{{{l:.1f}\\%}}"]
+        ev = df[df.problem.isin(ps)].evaluation.value_counts(normalize=True) * 100
+        real = ev.get("real_testbed", 0) + ev.get("real_testbed_users", 0)
+        simana = ev.get("simulation", 0) + ev.get("analytical", 0)
+        lines += [f"\\newcommand{{\\fn{lab}Real}}{{{real:.0f}\\%}}",
+                  f"\\newcommand{{\\fn{lab}Users}}{{{ev.get('real_testbed_users', 0):.0f}\\%}}",
+                  f"\\newcommand{{\\fn{lab}SimAna}}{{{simana:.0f}\\%}}",
+                  f"\\newcommand{{\\fn{lab}None}}{{{ev.get('none', 0):.0f}\\%}}"]
     (HERE / "data" / "function_numbers.tex").write_text("\n".join(lines) + "\n")

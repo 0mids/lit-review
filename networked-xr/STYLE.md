@@ -58,3 +58,18 @@ sec:provision (Provisioning the network: radio, resources, transport, architectu
 sec:connect (Connecting people and things: synchronisation, avatars, haptics, holoportation, twins),
 sec:assure (Assuring experience and trust: QoE, security, privacy),
 sec:synthesis, sec:agenda, sec:conclusion.
+
+## Revision 2 (applies to every function section)
+- Prose budget is now **1,150–1,300 words** (excluding the open-problems box, table and figure). The
+  whole review must fit in 30 pages.
+- Every function section MUST contain one **architecture or mechanism diagram** in TikZ: a system
+  view (components, tiers device/access/edge/cloud, data and control flows, where the section's
+  decisions are made), not a data chart. Width \linewidth or 0.9\linewidth, height ≤ 0.33 page,
+  `\sffamily\scriptsize`/`\footnotesize` labels, black text, thin strokes (0.5–0.7pt), rounded
+  boxes filled with the section colour at 6–12% (e.g. `fill=compute!8,draw=compute!70!black`),
+  arrows `-{Stealth[length=1.8mm]}`, a small legend if line styles carry meaning. Use the section
+  colour as accent only. No overlapping labels: render the page to PNG
+  (`pdftoppm -png -r 110 -f N -l N test_x.pdf out`) and look at it before finishing.
+- At most one compact table in addition to the diagram, and only if it carries numbers the prose
+  does not.
+- Figures use `[t]` placement, caption first sentence = what it shows, second = the point.

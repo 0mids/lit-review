@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\input{preamble}
+
+\title{\textbf{Carrying Immersion over Networks}\\[0.3em]
+  \large A Systematic Review of Networked Extended Reality, 2016--2026}
+\author{Networked XR Atlas}
+\date{\input{data/build_date}}
+
+\begin{document}
+\maketitle
+\input{sections/00_abstract}
+\setcounter{tocdepth}{1}
+{\small\tableofcontents}
+
+\IfFileExists{sections/01_introduction.tex}{\input{sections/01_introduction}}{}
+\IfFileExists{sections/02_method.tex}{\input{sections/02_method}}{}
+\IfFileExists{sections/03_landscape.tex}{\input{sections/03_landscape}}{}
+\IfFileExists{sections/04_framework.tex}{\input{sections/04_framework}}{}
+\IfFileExists{sections/05_encode.tex}{\input{sections/05_encode}}{}
+\IfFileExists{sections/06_anticipate.tex}{\input{sections/06_anticipate}}{}
+\IfFileExists{sections/07_compute.tex}{\input{sections/07_compute}}{}
+\IfFileExists{sections/08_provision.tex}{\input{sections/08_provision}}{}
+\IfFileExists{sections/09_connect.tex}{\input{sections/09_connect}}{}
+\IfFileExists{sections/10_assure.tex}{\input{sections/10_assure}}{}
+\IfFileExists{sections/11_synthesis.tex}{\input{sections/11_synthesis}}{}
+\IfFileExists{sections/12_agenda.tex}{\input{sections/12_agenda}}{}
+\IfFileExists{sections/13_conclusion.tex}{\input{sections/13_conclusion}}{}
+
+{\footnotesize\setlength{\bibsep}{1.5pt}
+\bibliographystyle{unsrtnat}
+\bibliography{data/references}}
+\end{document}

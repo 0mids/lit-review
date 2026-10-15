@@ -1,0 +1,226 @@
+\section{What Is Sent: Representing and Encoding Immersive Content}\label{sec:encode}
+
+Before a network can schedule, cache or adapt immersive content, a designer must decide what the content
+is: a sphere of pixels, a set of points, a bundle of camera views, the parameters of a neural scene
+model or a stream of force samples. This section asks which representation travels over the network
+and how it is compressed. The coding cell holds \fnEncodeN{} papers (\fnEncodeSh{} of the corpus), and
+its share rose from \fnEncodeEarly{} in 2017--2019 to \fnEncodeLate{} in 2022--2024. The content it
+serves has shifted. The share of 360-degree video papers fell from \nxrShContVideoThreeSixtyEarly{} to
+\nxrShContVideoThreeSixtyLate{} over the same periods, that of volumetric content rose from
+\nxrShContVolumetricPointcloudEarly{} to \nxrShContVolumetricPointcloudLate{}, and Gaussian splatting
+(\nxrKwGaussianSplattingEarly{} papers, then \nxrKwGaussianSplattingLate{}) and semantic communication
+(\nxrKwSemanticCommunicationEarly{}, then \nxrKwSemanticCommunicationLate{}) appeared from nothing.
+Evaluation lags the shift: \fnEncodeSimAna{} of coding papers are judged by simulation or analysis,
+\fnEncodeNone{} not at all and \fnEncodeUsers{} with users. The argument of this section is that the
+representation fixes three quantities before any network algorithm acts (the bitrate floor, the
+encoding delay and the decoding cost on the device) and that new representations are proposed faster
+than these quantities are measured. \Cref{fig:encode-chains} sets the main chains side by side.
+Adaptation, prediction and caching are treated in \cref{sec:anticipate}, and haptic transport and
+holoportation systems in \cref{sec:connect}.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\sffamily\scriptsize,
+  st/.style={draw=encode!70!black, fill=encode!8, rounded corners=1.5pt, line width=0.5pt,
+             text width=2.0cm, minimum height=0.8cm, align=center, inner sep=2pt},
+  hv/.style={st, fill=encode!26, draw=encode!80!black, line width=1.1pt},
+  flow/.style={-{Stealth[length=1.8mm]}, line width=0.55pt, draw=black!60},
+  rate/.style={font=\sffamily\scriptsize, fill=encode!5, inner sep=1pt, align=center, text=black,
+               text width=1.6cm},
+  hd/.style={font=\sffamily\footnotesize\bfseries, align=center, text width=2.1cm},
+  lane/.style={font=\sffamily\scriptsize\bfseries, anchor=south west, inner sep=0.5pt}]
+  \def\xa{0} \def\xb{2.48} \def\xc{4.96} \def\xd{7.44} \def\xn{9.45} \def\xe{11.46} \def\xf{13.94}
+  % network band
+  \fill[encode!5] (8.6,0.62) rectangle (10.3,-6.62);
+  \draw[densely dashed, encode!60!black, line width=0.5pt] (8.6,0.62) -- (8.6,-6.62);
+  \draw[densely dashed, encode!60!black, line width=0.5pt] (10.3,0.62) -- (10.3,-6.62);
+  \node[font=\sffamily\footnotesize\bfseries] at (\xn,0.25) {Network};
+  % headers
+  \foreach \x/\t in {\xa/Capture, \xb/Representation, \xc/Encoder, \xd/Packetise\\[-1pt]and transport,
+                     \xe/Decoder, \xf/Render and\\[-1pt]display}
+    \node[hd] at (\x,0.25) {\t};
+  % one lane: id, y, name, capture, representation, encoder, transport, encoder style,
+  % decoder, decoder style, renderer, renderer style, rate on the wire
+  \newcommand{\lanerow}[8]{%
+    \node[lane] at (-1.05,#2+0.43) {#3};
+    \node[st] (c#1) at (\xa,#2) {#4};
+    \node[st] (r#1) at (\xb,#2) {#5};
+    \node[#8] (e#1) at (\xc,#2) {#6};
+    \node[st] (t#1) at (\xd,#2) {#7};
+    \draw[flow] (c#1) -- (r#1); \draw[flow] (r#1) -- (e#1); \draw[flow] (e#1) -- (t#1);
+    \lanerest{#1}{#2}}
+  \newcommand{\lanerest}[2]{\def\li{#1}\def\ly{#2}\lanerestb}
+  \newcommand{\lanerestb}[5]{%
+    \node[#2] (d\li) at (\xe,\ly) {#1};
+    \node[#4] (p\li) at (\xf,\ly) {#3};
+    \draw[flow] (t\li) -- (d\li); \draw[flow] (d\li) -- (p\li);
+    \node[rate] at (\xn,\ly) {#5};}
+  \lanerow{1}{-0.75}{360-degree video}{camera rig,\\stitching}{ERP or cube map,\\region packing}
+    {HEVC/VVC tiles,\\quality ladder}{OMAF/DASH\\tile segments}{st}
+    {decoder per tile\\(CPU 18$\to$58\%)}{hv}{viewport\\extraction}{st}{6--22 Mbps}
+  \lanerow{2}{-2.0}{Point cloud}{RGB-D camera\\array}{points, octree,\\3D tiles}
+    {V-PCC (slow),\\G-PCC, Draco}{DASH or WebRTC,\\per tile}{hv}
+    {video decode and\\3D rebuild}{hv}{point splatting,\\6DoF view}{st}{19 Mbps live;\\raw 0.7--5 Gbps}
+  \lanerow{3}{-3.25}{Multi-view plus depth (MIV)}{colour + depth\\cameras}{view atlases\\(MIV/V3C)}
+    {HEVC or H.264\\per stream}{RTP or DASH,\\several streams}{st}
+    {hardware video\\decoders}{st}{view synthesis\\or fusion}{hv}{30--100 Mbps\\(7 streams)}
+  \lanerow{4}{-4.5}{Neural or semantic scene}{multi-view\\video}{3DGS/NeRF or\\semantic tokens}
+    {per-frame training\\($\approx$1 min/frame)}{parameters baked\\into 2D video}{hv}
+    {H.264 or neural\\decoder}{st}{splat rendering\\(37 ms/frame)}{hv}{0.53 MB\\per frame}
+  \lanerow{5}{-5.75}{Haptic}{force sensor,\\$\geq$1 kHz}{kinaesthetic or\\vibrotactile}
+    {perceptual\\deadband}{event-driven\\small packets}{st}
+    {hold or predict\\lost samples}{st}{actuator in the\\control loop}{st}{80--90\% fewer\\packets}
+  % sender / receiver braces
+  \draw[decorate, decoration={brace, amplitude=3pt, mirror}, draw=black!55]
+    (-1.05,-6.3) -- (8.5,-6.3) node[midway, below=3pt, font=\sffamily\scriptsize] {sender: capture and encoding};
+  \draw[decorate, decoration={brace, amplitude=3pt, mirror}, draw=black!55]
+    (10.4,-6.3) -- (15.0,-6.3) node[midway, below=3pt, font=\sffamily\scriptsize] {receiver: headset, phone or actuator};
+  % legend
+  \node[hv, text width=0.35cm, minimum height=0.28cm] (lg) at (-0.75,-7.05) {};
+  \node[anchor=west, font=\sffamily\scriptsize] at (lg.east) {stage that dominates computation};
+  \node[rate, text width=0.75cm, draw=encode!40] (lr) at (5.3,-7.05) {Mbps};
+  \node[anchor=west, font=\sffamily\scriptsize] at (lr.east) {bitrate or packet rate on the wire (examples from the text)};
+\end{tikzpicture}
+\caption{Transmission chains for the five main representations, from capture to display. The bitrate
+on the wire falls as the representation becomes more abstract, while computation moves to the encoder
+(V-PCC, per-frame training) or to the receiver (tile decoding, view synthesis, splat rendering). Figures:
+360-degree video \cite{W2623027537,W2896840651}, point clouds \cite{W4362496249,W3021314748}, multi-view
+streams \cite{W4200107448}, Gaussian video \cite{W4404525293}, deadband coding \cite{W2912555763}.}
+\label{fig:encode-chains}
+\end{figure}
+
+\subsection{360-degree video: a coding problem on a sphere}
+360-degree video reuses the 2D video chain, and its questions sit at the two ends: how the sphere is
+mapped to rectangles and how many decoders the client can afford. The established result is that
+concentrating bits on the viewport saves bitrate, but less than it saves pixels. Oculus's offset cube
+used fewer than half the pixels of an equirectangular frame for similar view quality, yet saved only
+5.6--16.4\% of bitrate; its 88 representations (22 orientations $\times$ 4 qualities) made the player
+download over 57\% extra segments \cite{W2623027537}. Content-adaptive coding in x265 saved 13--15\%
+BD-rate without subjective loss \cite{W2751058512}. At a fixed 6~Mbps a cube map with a full-quality
+front face beat three other layouts, and pyramids failed under head motion \cite{W2527384707};
+projections other than equirectangular gain about 10\% in coding \cite{W4361857501}.
+
+The delivery unit is contested. Viewport-specific versions need no reassembly but multiply storage;
+tiles share one encode but cost 7.3--10.4\% in coding efficiency \cite{W2896840651}, and up to 37.3\%
+for small tiles at low resolution \cite{W2623784065}. Point-of-view scalable coding claims about 75\%
+saving \cite{W2894699932} against Oculus's 5.6--16.4\%, a gap explained mostly by baselines (a whole
+equirectangular frame against a multi-version ladder). The client pays for tiles: Flare raised phone
+CPU load from 18\% to 58\% \cite{W2896840651}, and streaming took 28.5\% of headset power
+\cite{W2626466913}, both on 2017--2018 hardware. OMAF standardises projection, region-wise packing and
+quality descriptors \cite{W3137710672}, yet network studies almost always assume tiled equirectangular
+video, so their results may not transfer to deployed formats. Gaze adds a lever with user evidence:
+gaze-based quantisation saved 40--47\% in cloud VR gaming \cite{W3174397927}, and gaze-contingent
+compression was five times more effective when motion-to-photon (MTP) latency stayed below 15~ms
+\cite{W4214531162}.
+
+\subsection{Volumetric content: points, meshes and views}
+Volumetric content is one to three orders of magnitude heavier than 2D video, and its codecs trade
+compression ratio against speed. Raw point clouds need 720~Mbit/s at 200K points and 30~fps
+\cite{W3021314748}, and about 5~Gbit/s at one million points \cite{W4362496249}. V-PCC projects patches
+onto planes and reuses video codecs; it reaches lossy ratios of 100--500 but took about 4~hours to encode
+30 frames of one object \cite{W3096788322}. G-PCC and Draco code geometry in 3D, run fast and compress
+less. Live systems therefore avoid V-PCC. VR2Gather's MPEG Anchor codec cut 281.8~Mbit/s to 19.0~Mbit/s
+but raised latency from 40.6 to 278.7~ms, and parallel tiles brought it back to 90.6~ms
+\cite{W4362496249}: coding, not transit, set the delay. Tuning the standard codecs yields single-digit
+gains, such as BD-rate reductions of 2.16\% (geometry) and 6.13\% (attributes) from V-PCC rate control
+\cite{W4405304599}. Larger gains come from changing the representation: sub-sampling before V-PCC cut
+bitrate by up to 48.5\% at equal quality \cite{W4379806044}, and 3D patch coding matched V-PCC's ratio
+with real-time decoding \cite{W4379928158}.
+
+The receiver is the second constraint. An off-the-shelf 3D super-resolution model ran at about 0.1~fps
+until it was made 53 times faster on mobile hardware \cite{W3132559889}, and Hermes reached 30~fps on
+phones by exploiting inter-frame correlation \cite{W4387967921}. No codec wins everywhere: a measurement
+of Draco, G-PCC, V-PCC and two neural codecs found that the best choice depends on content and viewing
+behaviour \cite{W4321488303}, and static mesh codecs show the same trade-off \cite{W2911819174}.
+
+What deployed live systems send is often views rather than geometry. Project Starline sends four colour
+and three depth H.265 streams at 30--100~Mbit/s and fuses them at the receiver, because real-time mesh
+or point-cloud compression was not possible at its resolution \cite{W4200107448}; MetaStream codes RGB-D
+in 2D on the cameras and builds point clouds at the edge \cite{W4387212733}. MPEG Immersive Video (MIV)
+standardises this multi-view-plus-depth path, with atlas packing \cite{W4210296418} and view synthesis at
+the decoder \cite{W3034756801}, so hardware video decoders do most of the work. Yet only one of about
+twenty corpus papers on MIV uses a real network, and none has users. Light fields follow the same
+pattern: DASH delivery of static light fields \cite{W2902432774} and multiple-description coding of
+light-field video \cite{W3217186695} were tested without real links. Whether to send geometry or views is
+the main open question of this strand. No study compares point clouds, meshes, multi-view video and
+Gaussian splats at matched perceived quality, bitrate and latency.
+
+\subsection{Neural and semantic representations}
+Neural representations replace explicit geometry with model parameters, and semantic codecs replace
+pixels with meaning. Both promise large gains; neither has yet faced a variable network. The most
+deployable design reuses existing hardware: V$^3$ bakes dynamic Gaussians into 2D videos for H.264
+decoders and reaches 32.97~dB PSNR at 0.532~MB per frame and 27~fps on a phone \cite{W4404525293}. Its
+costs show where the work moves. Training takes about a minute per frame on a desktop GPU, so live
+content is out of reach, and download was measured only on an internal network. Other designs offer
+single-model variable bitrate for NeRF video \cite{W4400667199}, training 300 times faster than NeRF
+\cite{W4387038058}, full-scene splat streaming at 30~fps on phones \cite{W4416477288}, and layered splats
+for adaptive streaming judged on visual fidelity alone \cite{W4402704690}. Only two of some thirty
+neural coding papers address progressive coding or bandwidth variation, and a doctoral plan still lists
+progressive transmission, quality assessment and error control as open \cite{W4408847683}.
+
+Semantic codecs report the largest savings and the weakest comparisons. WiserVR sent 1.81~Mbit instead
+of 28.3~Mbit for 20 frames, in an AWGN simulation that excluded the delay of sharing the knowledge base
+\cite{W4324296656}; learned point-cloud features gave more than 30$\times$ compression
+\cite{W4312303599}; MagicStream reports up to 1195$\times$ less bandwidth \cite{W4404034698}. The one
+generative prototype timed end to end cut bandwidth by 99.93\% but raised latency from 980~ms to
+13.66~s \cite{W4403677254}. Fidelity is defined differently in each paper (PSNR on a noisy channel,
+joint-position error, text similarity), task metrics can disagree with perceived realism
+\cite{W4385452934}, and the baseline is usually BPG with LDPC rather than HEVC or VVC at matched quality.
+An order-of-magnitude saving is plausible; its price in inference delay and device energy is assumed
+rather than measured.
+
+\subsection{Holograms and touch as signals}
+Holographic and haptic content sit at opposite ends of the rate scale, and in both the requirement
+figures depend on an unstated representation. Akyildiz and Guo define a hologram as a recorded light
+field and then adopt point clouds as the working form \cite{W4300960574}. Their worked example, a
+1.5~m$\times$0.75~m light-field display with 0.5~mm hogels, needs 221~GB per frame, or 6.63~TBps at
+30~fps, and they table holographic calls at 1--10~Tbps. Measured systems used 5--100~Mbps for
+compressed point clouds over live 5G \cite{W4312662428}, 173~Mbps for full-duplex light-field
+telepresence \cite{W3176472668} and 60--200~Mbit/s for display-ready phase holograms \cite{W3006491471}.
+The gap of four to five orders of magnitude separates uncompressed display arithmetic from compressed
+capture; the two are not estimates of one quantity. For live use, codec delay binds first: V-PCC needs
+11--42 minutes to encode one second \cite{W4309030584}, and an uncompressed prototype ran at 8~fps with
+more than 300~ms of latency \cite{W4395097214}. Optical holograms are only now becoming coded media, with
+a learnable JPEG-style codec that decodes in 4.2~ms \cite{W4417448513} and bit allocation between real
+and imaginary parts \cite{W7218855457}, both judged by PSNR or BD-rate alone.
+
+Haptic signals need little rate and strict timing. Kinaesthetic samples are sent at 1~kHz or more to
+keep the control loop stable, and a 3-DoF packet carries 6~bytes of payload against 20--40~bytes of
+header \cite{W2216406802}. Perceptual deadband coding sends a sample only when its change exceeds a
+Weber fraction (7--15\% for force) and removes 80--90\% of packets without perceptible loss; two
+independent implementations of the IEEE~1918.1.1 kinaesthetic codec reproduced the same rates and errors
+\cite{W2912555763}. The standard separates delay-free kinaesthetic coding from vibrotactile coding, which
+may use block transforms with tens of milliseconds of algorithmic delay \cite{W2911218692}; a
+speech-derived vibrotactile codec reached 2.3~kb/s without perceived distortion \cite{W2811040154}. These
+results are established for a single contact point. Learned multichannel codecs report bitrate or
+traffic cuts of 80--92\% \cite{W7131889935,W4406137775}, mostly in simulation and against each other
+rather than a standard anchor, and the one standard-compliant encoder in the corpus still calls the
+standard future work \cite{W4410887405}. Deadband coding also makes traffic bursty, so the periodic
+1~ms flow that transport studies assume is not what a codec emits.
+
+\begin{openproblems}
+\item \textbf{Semantic and generative codecs are not evaluated end to end.} Of the semantic papers in the
+  cell, one uses a real testbed and none reports a subjective test. Comparing them with HEVC, VVC and
+  V-PCC at matched rated quality on an open 5G testbed, timing encoder and decoder inference, would
+  show whether bandwidth savings survive latency.
+\item \textbf{New representations have no perceptual ground truth.} No public rating dataset exists for
+  compressed Gaussian, neural or generative reconstructions viewed in a headset, so PSNR and LPIPS are
+  unvalidated for their artefacts. A six-degrees-of-freedom rating study across codecs and rates would
+  supply one.
+\item \textbf{Geometry and views have never been compared, and MIV is almost untested on networks.}
+  One of about twenty MIV papers uses a real network. Encoding the same scenes as point clouds, meshes,
+  MIV and Gaussian splats over replayed 5G traces, at matched rated quality, would show which
+  representation minimises bitrate and latency.
+\item \textbf{Codecs are tuned at fixed rates.} Coding papers rarely use bandwidth traces, cellular
+  links or 3GPP XR traffic models, and neural codecs lack bitrate ladders. Rate control driven by
+  measured capacity, evaluated on frame-deadline misses, would test whether codec gains hold on mobile
+  links.
+\item \textbf{Hologram requirements describe no real hologram.} Half the holographic papers name no
+  representation, and no measured traffic trace exists for any of them. A benchmark that captures one
+  scene, codes it as point clouds, splats, light fields and phase holograms, and records traces, would
+  replace requirement tables with measured figures.
+\item \textbf{Coded haptic streams lack shared content and loss tests with users.} Haptic codecs are
+  evaluated on one-off recordings, and none under realistic loss with participants. Released reference
+  recordings and a within-subjects study of deadband and vibrotactile codecs over replayed 5G and Wi-Fi
+  impairments would close both gaps.
+\end{openproblems}

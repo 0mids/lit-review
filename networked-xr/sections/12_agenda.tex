@@ -1,0 +1,82 @@
+\section{Research Agenda}\label{sec:agenda}
+
+The open problems of Sections~\ref{sec:encode}--\ref{sec:assure} merge into \nxrSynProjects{} projects
+that a university networking or multimedia laboratory could start now. Together they would close
+\nxrSynProjGapsClosed{} of the \nxrSynGapsTotal{} verified gaps, \nxrSynProjHighClosed{} of them with high
+confidence. We order them by dependency, following \cref{fig:themes}: projects that produce shared
+artefacts come first, because the others consume them (\cref{fig:roadmap}).
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\sffamily\scriptsize,
+  pj/.style={draw=black!55,rounded corners=2pt,fill=white,align=left,text width=4.45cm,inner sep=2.2pt,minimum height=6.4mm},
+  ph/.style={font=\sffamily\footnotesize\bfseries,text=black!75,anchor=north west},
+  arr/.style={-{Stealth[length=1.6mm]},black!50,line width=0.55pt}]
+  \fill[black!4,rounded corners=3pt] (-0.15,0.5) rectangle (4.85,-5.35);
+  \fill[black!4,rounded corners=3pt] (5.6,0.5) rectangle (10.6,-5.35);
+  \fill[black!4,rounded corners=3pt] (11.35,0.5) rectangle (16.35,-5.35);
+  \node[ph] at (-0.05,0.42) {Phase 1: shared artefacts};
+  \node[ph] at (5.7,0.42) {Phase 2: studies using the traces};
+  \node[ph] at (11.45,0.42) {Phase 3: traces and QoE model};
+  \node[pj,fill=gapcolor!7,draw=gapcolor!70!black] (a1) at (2.35,-0.5) {\textbf{A1} XR-Trace: open, frame-synchronised traces checked against 3GPP models};
+  \node[pj,fill=gapcolor!7,draw=gapcolor!70!black] (a2) at (2.35,-1.75) {\textbf{A2} Rated trace-replay dataset for interactive XR QoE};
+  \node[pj] (a4) at (2.35,-4.6) {\textbf{A4} Measured GPU and headset-energy cost models for split rendering};
+  \foreach \n/\y/\t in {a3/-0.45/{\textbf{A3} Closed-loop benchmark for viewport and pose predictors},
+                        a5/-1.32/{\textbf{A5} L4S, delay-based control and FEC on real bottlenecks},
+                        a6/-2.19/{\textbf{A6} Privacy--QoE frontier of traffic defences},
+                        a7/-3.06/{\textbf{A7} Haptic tolerance curves and an open haptic corpus},
+                        a8/-3.93/{\textbf{A8} Interest-managed avatar replication beyond 100 clients},
+                        a9/-4.8/{\textbf{A9} Percentile latency budgets for 6DoF split rendering}}
+    {\node[pj] (\n) at (8.1,\y) {\t};}
+  \foreach \n/\y/\t in {a10/-0.45/{\textbf{A10} Uplink-first scheduling for dense co-located headsets},
+                        a11/-1.5/{\textbf{A11} Standards-conformant immersive streaming over 5G},
+                        a12/-2.55/{\textbf{A12} Sim-to-real transfer of learned controllers on an open RAN},
+                        a13/-3.6/{\textbf{A13} Group QoE and fairness for three to six users},
+                        a14/-4.65/{\textbf{A14} Semantic, splat and geometric telepresence at matched bitrate}}
+    {\node[pj] (\n) at (13.85,\y) {\t};}
+  \coordinate (b1) at (5.22,0);
+  \draw[arr] (a1.east) -- (b1 |- a1.east) |- (a3.west);
+  \foreach \t in {a5,a6,a7,a8,a9}{\draw[arr] (b1 |- a1.east) |- (\t.west);}
+  \draw[arr] (a1.south) -- (a2.north);
+  \coordinate (b2) at (10.97,0);
+  \draw[arr,gapcolor!70!black,rounded corners=2pt] (a2.east) -- ++(0.25,0) -- ++(0,-3.85) -- (10.97,-5.6+0.0) -- (b2 |- a14.west);
+  \foreach \t in {a10,a11,a12,a13,a14}{\draw[arr,gapcolor!70!black] (10.97,-5.1) |- (\t.west);}
+\end{tikzpicture}
+\caption{Research agenda as a dependency roadmap. Phase-1 projects (red) build the artefacts that the
+others consume. A1 supplies traces to every later project (grey arrows); A2, built on A1, adds the
+validated QoE model that the Phase-3 projects optimise against (red arrows). A4 stands alone.}\label{fig:roadmap}
+\end{figure}
+
+\paragraph{Phase 1: build what others need.} \emph{XR-Trace} (A1) would instrument the main workloads on
+5G standalone and Wi-Fi~6E/7, with one, four and eight users. These are split-rendered VR, AR camera
+offloading, avatar and shared-state traffic, tiled 360-degree video and twin-state updates. Each trace
+would record pose, encoder output, packets at both ends, application events and photodiode MTP on a
+common clock. The project would then fit traffic models, compare them with the 3GPP XR models, and release
+the traces with a replay harness for ns-3 and NetEm. It closes \nxrSynPTracesGaps{} gaps and ranks first
+because \nxrSynPTracesUnlocks{} projects consume it. The \emph{rated replay dataset} (A2) would have
+participants perform interactive tasks while the network replays A1's traces. It would collect momentary
+and session ratings, sickness scores, task performance and packet logs together, so that a QoE model can
+be fitted and then used as the objective by other work. It would also measure the difference between
+replayed dynamics and independent impairments of the same mean. \emph{Energy cost models} (A4) would
+replace the assumed GPU and battery costs inside offloading optimisers with measured ones.
+
+\paragraph{Phase 2 and 3: answer the open questions on shared ground.} With traces in hand, five
+studies become cheap and comparable. They are a closed-loop predictor benchmark with persistence and
+Kalman baselines (A3), transport on real bottlenecks (A5), a privacy--QoE frontier for padding and jitter
+defences (A6), haptic tolerance curves (A7) and interest-managed replication beyond one hundred clients
+(A8). A percentile latency budget for 6DoF split rendering (A9) completes the phase. With a validated QoE
+model as well, the remaining projects can optimise against experience rather than a proxy. These are
+uplink-first scheduling (A10), a standards-conformant 5G pipeline (A11), sim-to-real transfer of learned
+controllers as xApps on an open RAN (A12), group QoE and fairness (A13), and a matched-bitrate comparison
+of semantic, Gaussian-splat and geometric telepresence (A14).
+
+\paragraph{The evaluation bar.} Each project should meet the standard that Transactions-level reviewers
+apply and that most of the corpus does not meet. First, a \emph{baseline ladder}: a trivial baseline,
+a classical method, the strongest recent method re-implemented under the same conditions, an ablation
+and, where computable, an oracle. Second, \emph{realism with control}: real hardware for the claim and
+trace replay for repeatability, with the gap between simulation and measurement reported. Third,
+\emph{out-of-distribution tests} for anything learned, on held-out users, content and networks. Fourth,
+\emph{sound statistics}: repeated runs with confidence intervals and, for user studies, a power analysis,
+within-subjects designs and mixed-effects models. Fifth, \emph{reported cost and released artefacts}: run
+time, energy and signalling overhead on the target device, with code, traces and analysis scripts
+published.

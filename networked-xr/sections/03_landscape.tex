@@ -1,0 +1,80 @@
+\section{The Field at a Glance}\label{sec:landscape}
+
+\paragraph{Growth.} Annual output rose from \nxrPapersSeventeen{} papers in 2017 to
+\nxrPapersTwentyFour{} in 2024, a factor of \nxrGrowthFactor{} and a compound growth of \nxrCagrTotal{}
+a year (\cref{fig:growth}a). Growth was steady until 2022 and then jumped, largely with the metaverse.
+Papers that use the word went from \nxrMetaverseTwentyOne{} in 2021 to \nxrMetaverseTwentyTwo{} in 2022
+and \nxrMetaverseTwentyThree{} in 2023. More than half of all included papers (\nxrShareSince{})
+appeared from 2023 onward. The field is conference-led: \nxrShareConfPapers{} of papers are conference
+papers. It is also spread across communities that seldom publish in each other's venues. Communications
+venues (Globecom, ICC, \emph{IEEE Network}, \emph{JSAC}) sit beside multimedia-systems venues (MMSys,
+ACM Multimedia, \emph{IEEE Transactions on Multimedia}) and broad open-access journals. The ten largest
+venues hold only \nxrShareTopTenVenues{} of the corpus. XR venues proper barely appear, so perceptual
+results from the XR community, such as tolerable latency, reach networking papers late.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_growth}
+\caption{Growth and evaluation realism. (a)~Included papers per year; 2016, 2025 and 2026 are partial
+because of the harvest window and indexing lag. (b)~Share of papers by the most realistic evaluation
+they report. Evaluation on real networks or testbeds (the two darkest bands) shrank as simulation
+grew.}\label{fig:growth}
+\end{figure}
+
+\paragraph{From delivering content to allocating resources.} The composition of the field changed more
+than its size (\cref{fig:shifts}). In 2017--19 the largest problem was rate adaptation and streaming,
+with \nxrShProbRateAdaptationStreamingEarly{} of papers. By 2022--24 its share had fallen to
+\nxrShProbRateAdaptationStreamingLate{}, the largest decline of any problem. Resource allocation rose from
+\nxrShProbResourceAllocationEarly{} to \nxrShProbResourceAllocationLate{}, and architecture and vision
+papers from \nxrShProbArchitectureVisionEarly{} to \nxrShProbArchitectureVisionLate{}. Security, privacy
+and trust grew fastest of all, at \nxrCagrProbSecurityPrivacyTrust{} a year. At the level of functions,
+anticipation fell from \fnAnticipateEarly{} to \fnAnticipateLate{} of output and provisioning rose from
+\fnProvisionEarly{} to \fnProvisionLate{}. These are shares: streaming still grew in absolute terms, but
+far more slowly than the field. The shift reflects a change of authors. The early literature was led by
+multimedia-systems groups building 360-degree players. The later literature is led by wireless groups
+who formulate XR delivery as a joint allocation of radio, computing and energy, and by authors of 6G and
+metaverse visions.
+
+\paragraph{From 360-degree video to ``XR traffic''.} The reference workload changed with the problems.
+360-degree video was the content of \nxrShContVideoThreeSixtyEarly{} of papers in 2017--19 and of
+\nxrShContVideoThreeSixtyLate{} in 2022--24. The largest gain went to papers that name no specific
+content and model XR as a rate and a delay bound (\nxrShContGeneralXrTrafficEarly{} $\to$
+\nxrShContGeneralXrTrafficLate{}). Among specific contents, volumetric media, digital-twin data, rendered
+frames and holograms grew, while AR overlays and haptic signals declined. The rise of generic traffic
+matters for the evidence. A constant-rate flow with a delay bound cannot express viewport dependence,
+frame-size variability or the coupling between uplink pose and downlink content. These are exactly the
+properties that the content-specific literature has measured.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_shifts}
+\caption{Change in composition between 2017--19 (open circles) and 2022--24 (filled circles), with the
+difference in percentage points. Colours give the function of \cref{sec:framework}. The field moved from
+anticipation (streaming 360-degree video) to provisioning (allocating resources for generic XR
+traffic).}\label{fig:shifts}
+\end{figure}
+
+\paragraph{From systems to learning, and from testbeds to simulators.} System implementations fell from
+\nxrShMethSystemImplementationEarly{} to \nxrShMethSystemImplementationLate{} of papers. Reinforcement
+learning grew from \nxrShMethReinforcementLearningEarly{} to \nxrShMethReinforcementLearningLate{}, at
+\nxrCagrMethReinforcementLearning{} a year, and supervised deep learning from
+\nxrShMethDeepLearningEarly{} to \nxrShMethDeepLearningLate{}. User studies, rare to begin with, fell from
+\nxrShMethUserStudyEarly{} to \nxrShMethUserStudyLate{}, and in ten years the corpus contains only
+\nxrNDatasets{} papers whose main contribution is a dataset. Evaluation followed the methods
+(\cref{fig:growth}b). Evaluation on a real network or testbed fell from \nxrEvalRealEarly{} of papers to
+\nxrEvalRealLate{}, while simulation and analysis alone rose from \nxrEvalSimAnaEarly{} to
+\nxrEvalSimAnaLate{}. The fastest-growing methods are those least often tested on real links:
+\nxrRLSimShare{} of reinforcement-learning papers are evaluated by simulation alone and only
+\nxrRLRealShare{} on a real testbed. Learned controllers may well work. But most of their reported gains
+are gains inside a model of the network, usually one with synthetic channels, traffic and user motion.
+
+\paragraph{What is new.} Four clusters of author keywords rose fastest between 2018--20 and 2023--25. The
+first is the metaverse and 6G (``metaverse'' from \nxrKwMetaverseEarly{} paper to \nxrKwMetaverseLate{};
+``6G'' from \nxrKwSixGEarly{} to \nxrKwSixGLate{}). The second is digital twins (\nxrKwDigitalTwinEarly{}
+$\to$ \nxrKwDigitalTwinLate{}). The third is learning-based networking, including federated learning
+(\nxrKwFederatedLearningEarly{} $\to$ \nxrKwFederatedLearningLate{}). The fourth is new representations
+and transmission paradigms: semantic communication (\nxrKwSemanticCommunicationEarly{} $\to$
+\nxrKwSemanticCommunicationLate{}), Gaussian splatting (\nxrKwGaussianSplattingEarly{} $\to$
+\nxrKwGaussianSplattingLate{}) and holographic communication (\nxrKwHolographicCommunicationEarly{} $\to$
+\nxrKwHolographicCommunicationLate{}). Much of this new literature consists of visions and surveys.
+Sections~\ref{sec:encode}--\ref{sec:assure} ask how much of it has yet met a real network.
