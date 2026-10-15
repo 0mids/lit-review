@@ -105,12 +105,19 @@ systems under different conditions; they locate each cost but are not matched op
 Family & Idea & Cost on wire & Cost at sender & Cost at receiver & Maturity\\
 \midrule
 Image & 360-degree video: sphere projected to rectangles, bits on the viewport & 6--22~Mbps & low; tiles lose 7--10\% efficiency & a decoder per tile, CPU 18$\to$58\% & standard (OMAF), deployed\\
+\addlinespace[2pt]
 Image & Multi-view plus depth (MIV): camera views, new views synthesised & 30--100~Mbps & low; hardware video encoders & several decoders and view synthesis & standard; rarely tested on networks\\
+\addlinespace[2pt]
 Geometry & Point clouds (V-PCC, G-PCC, Draco) & 19~Mbps live; raw up to 5~Gbps & V-PCC hours per second of content; G-PCC, Draco fast & 3D rebuild; 30~fps on phones needs inter-frame coding & standard; on-demand prototypes\\
+\addlinespace[2pt]
 Geometry & Meshes: surfaces from fused depth & 14~Mbps mean (reconstructed scene) & reconstruction & rasterisation & static codecs benchmarked\\
+\addlinespace[2pt]
 Learned & Neural scene (NeRF, 3DGS): model parameters per frame & 0.53~MB per frame & training $\approx$1~min per frame & splat rendering, 37~ms per frame & research prototypes\\
+\addlinespace[2pt]
 Learned & Semantic and generative: meaning, not pixels & 93--99.9\% less & inference, shared knowledge base & generative inference; 13.7~s end to end & simulation, one 5G prototype\\
+\addlinespace[2pt]
 Signal & Haptic: samples sent only above a perceptual threshold & 80--90\% fewer packets & negligible, delay-free & hold or predict missing samples & standard (IEEE~1918.1.1)\\
+\addlinespace[2pt]
 Signal & Holographic: light field or phase pattern & 6.63~TBps by arithmetic; 173~Mbps measured & V-PCC 11--42~min per second & display not characterised & requirement tables\\
 \bottomrule
 \end{tabularx}
