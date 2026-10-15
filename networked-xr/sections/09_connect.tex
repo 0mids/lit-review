@@ -4,7 +4,7 @@ Once several people or machines share one world, delivering media is not enough.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
   >={Stealth[length=1.8mm]},
   box/.style={draw=connect!70!black, fill=connect!10, rounded corners=2pt, align=center,
               line width=0.5pt, inner sep=2pt, text=black},
@@ -57,7 +57,7 @@ Once several people or machines share one world, delivering media is not enough.
   \draw[inter, ->] (5.3,0) -- (6.1,0); \node[lab, anchor=west] at (6.2,0) {interactive loop (perception-bound)};
   \draw[fresh, ->] (10.9,0) -- (11.7,0); \node[lab, anchor=west] at (11.8,0) {freshness loop (decision-bound)};
 \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Architecture of a multi-party XR session: a co-located group and a remote user share state through an edge relay, a capture rig feeds edge fusion for holoportation, and an operator drives a remote robot whose digital twin updates every viewer. The loops differ in what bounds them (line style), so no single latency target serves the session. Numbers are measured values cited in the text: avatar rates and replication latency \cite{W4307020344}, holoportation rates and latency \cite{W4312662428,W4307263396}, anchors \cite{W4311118480,W4411499419}, twin updates \cite{W7213228059,W7168263637}, haptic rate and tolerance \cite{W2912555763,W2216406802,W4200154132}.}
 \label{fig:connect-arch}
 \end{figure}

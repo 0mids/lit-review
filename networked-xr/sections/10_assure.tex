@@ -12,7 +12,7 @@ draws the measurement chain, the attack surfaces and the points where defences a
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize,
   box/.style={draw=assure!70!black, fill=assure!8, rounded corners=2pt, align=center, text width=2.9cm,
     minimum height=10mm, inner sep=2pt, line width=0.6pt},
   sys/.style={draw=black!55, fill=black!3, rounded corners=2pt, align=center, text width=2.1cm,
@@ -65,7 +65,7 @@ draws the measurement chain, the attack surfaces and the points where defences a
   \tikz[baseline=-0.6ex]\draw[tap] (0,0)--(0.6,0); attack (accuracy)\\[1pt]
   Also measured: AR user location from traffic, 94\%. Defence cost: \mbox{encrypting} 1400-byte packets misses
   a 0.35~ms edge budget; padding or jitter alone does not stop scene leakage.};
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Measurement chain and attack surfaces of a networked XR session. Solid arrows are links that user
 or traffic studies have measured, dashed arrows links that are assumed; red taps show measured attack
 accuracies, and defences sit on the flows where they add delay that has rarely been priced against the

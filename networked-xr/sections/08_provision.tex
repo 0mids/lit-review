@@ -14,7 +14,7 @@ transport and architecture.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
   box/.style={draw=provision!70!black, fill=provision!9, rounded corners=1.5pt, align=center,
               inner sep=2.5pt, minimum height=0.78cm, line width=0.5pt},
   dev/.style={box, fill=black!4, draw=black!55},
@@ -78,7 +78,7 @@ transport and architecture.
   \node[lab, anchor=west] at (11.9,2.65) {control};
   \draw[dotted, line width=0.7pt, draw=provision!80!black] (13.0,2.65) -- (13.6,2.65);
   \node[lab, anchor=west] at (13.65,2.65) {slice};
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{End-to-end 5G/6G and Wi-Fi delivery chain for XR, with the layer at which each subsection makes
 its decisions. The link acts on the last hop, the scheduler inside the slice, transport across the whole
 path and architecture across all tiers; most designs optimise one layer and hold the others fixed.}

@@ -4,7 +4,7 @@ An immersive client displays only a fraction of what it could receive, and it mu
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize, x=1cm, y=1cm,
   bx/.style={draw=anticipate!70!black, fill=anticipate!9, rounded corners=1.5pt, line width=0.5pt,
              minimum height=0.78cm, align=center, inner sep=2pt, text=black},
   data/.style={-{Stealth[length=1.8mm]}, line width=0.6pt, draw=black!75},
@@ -74,7 +74,7 @@ An immersive client displays only a fraction of what it could receive, and it mu
   % legend
   \draw[data] (13.05,-1.4) -- ++(0.6,0) node[note, right=1pt] {content};
   \draw[req] (14.85,-1.4) -- ++(0.6,0) node[note, right=1pt] {requests};
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Viewport-adaptive delivery of tiled 360-degree or volumetric content across client, edge and origin, with the three anticipation decisions marked. Each decision is a bet on where the user will look: the buffer length fixes how far ahead the predictor must see, and the edge cache pays off only when viewers' viewports overlap.}
 \label{fig:anticipate-arch}
 \end{figure}

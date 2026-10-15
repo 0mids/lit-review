@@ -11,7 +11,7 @@ delay a split adds, how to hide that delay, and what the split costs the device.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[x=1cm, y=1cm, font=\sffamily\scriptsize,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[x=1cm, y=1cm, font=\sffamily\scriptsize,
   st/.style={draw=compute!70!black, fill=compute!10, rounded corners=1.5pt, line width=0.5pt,
              minimum width=2.05cm, minimum height=0.62cm, align=center, inner sep=1.5pt},
   est/.style={st, minimum width=2.3cm},
@@ -88,7 +88,7 @@ delay a split adds, how to hide that delay, and what the split costs the device.
     \draw[loc] (0,-0.3) -- (0.6,-0.3);   \node[lab, anchor=west] at (0.68,-0.3)  {stays in one tier};
     \draw[alt] (0,-0.6) -- (0.6,-0.6);   \node[lab, anchor=west] at (0.68,-0.6)  {alternative host};
   \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Where each pipeline stage runs in full remote rendering, split rendering and AR perception
 offload. The split point is where the pipeline crosses the access network; display, and in AR also
 tracking, stay on the device in every design, which is what makes delay hiding possible. Values: MTP budget \cite{W2784711283}, 60~GHz end-to-end latency

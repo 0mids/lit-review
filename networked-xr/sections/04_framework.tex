@@ -11,7 +11,7 @@ summarises the families of approaches that each function contains.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize,
   tier/.style={draw=black!15,fill=black!3,rounded corners=3pt,minimum width=3.75cm,minimum height=5.85cm,anchor=north},
   tierhead/.style={font=\sffamily\footnotesize\bfseries,text=black!75},
   comp/.style={draw=black!55,fill=white,rounded corners=2pt,align=center,minimum height=7.5mm,text width=3.2cm,inner sep=1.5pt,line width=0.5pt},
@@ -74,7 +74,7 @@ summarises the families of approaches that each function contains.
     \draw[down] (0,-0.05) -- (0.55,-0.05) node[right,text=black]{downlink content};
     \draw[ctl] (0,-0.32) -- (0.55,-0.32) node[right,text=black]{control and shared state};
   \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Reference architecture of a networked XR system, with the six functions placed where they act.
 Rows read left to right as the uplink of pose and captured media, right to left as the downlink of
 content, and as control and shared state that couple users and remote machines. The same function often

@@ -6,7 +6,7 @@ Projects that produce shared artefacts come first, because the others need them.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize,
   pj/.style={draw=black!55,rounded corners=2pt,fill=white,align=left,text width=4.45cm,inner sep=2.2pt,minimum height=6.4mm},
   ph/.style={font=\sffamily\footnotesize\bfseries,text=black!75,anchor=north west},
   arr/.style={-{Stealth[length=1.6mm]},black!50,line width=0.55pt}]
@@ -39,7 +39,7 @@ Projects that produce shared artefacts come first, because the others need them.
   \coordinate (b2) at (10.97,0);
   \draw[arr,gapcolor!70!black,rounded corners=2pt] (a2.east) -- ++(0.25,0) -- ++(0,-3.85) -- (10.97,-5.6+0.0) -- (b2 |- a14.west);
   \foreach \t in {a10,a11,a12,a13,a14}{\draw[arr,gapcolor!70!black] (10.97,-5.1) |- (\t.west);}
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Research agenda as a dependency roadmap. Phase-1 projects (red) build the artefacts that the
 others consume. A1 supplies traces to every later project (grey arrows); A2, built on A1, adds the
 validated QoE model that the Phase-3 projects optimise against (red arrows). A4 stands alone.}\label{fig:roadmap}

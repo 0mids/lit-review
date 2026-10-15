@@ -80,7 +80,7 @@ applied. An L4S pipeline for volumetric conferencing converged 45\% faster than 
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[font=\sffamily\scriptsize,
+\begin{adjustbox}{max width=\linewidth}\begin{tikzpicture}[font=\sffamily\scriptsize,
   th/.style={draw=black!55,rounded corners=2pt,align=center,text width=2.35cm,minimum height=8mm,inner sep=2pt,fill=white},
   root/.style={th,fill=gapcolor!8,draw=gapcolor!70!black,line width=0.7pt},
   arr/.style={-{Stealth[length=1.6mm]},black!55,line width=0.55pt}]
@@ -101,7 +101,7 @@ applied. An L4S pipeline for volumetric conferencing converged 45\% faster than 
   \draw[arr] (t7.east) -- (t9.west);
   \draw[arr] (t8.east) -- (t9.south west);
   \node[font=\sffamily\tiny,text=black!60,align=left,anchor=west] at (9.6,-0.95) {arrow: the target theme\\needs the source's artefact};
-\end{tikzpicture}
+\end{tikzpicture}\end{adjustbox}
 \caption{Dependencies among the nine themes. Open traces (T1) and a validated mapping from network
 metrics to experience (T4) are the roots. Without them, simulations cannot be validated, requirements
 cannot be derived, and allocation, transport and security results cannot be compared in units that matter

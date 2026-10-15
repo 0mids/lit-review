@@ -2,6 +2,7 @@
 % acmart already loads amsmath, xcolor, graphicx, hyperref, natbib and booktabs; layout and fonts are
 % fixed by the class and are not changed here.
 \usepackage{tabularx,multirow,array}
+\usepackage{adjustbox}
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage[most]{tcolorbox}
@@ -26,3 +27,4 @@
   boxrule=0.6pt,arc=1.5pt,fonttitle=\bfseries\sffamily\small,title={Open problems},
   left=5pt,right=5pt,top=3pt,bottom=3pt}
 \newenvironment{openproblems}{\begin{openproblemsbox}\small\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=2em,itemsep=2pt]}{\end{enumerate}\end{openproblemsbox}}
+\setlength{\emergencystretch}{1.5em}
